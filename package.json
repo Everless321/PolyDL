@@ -1,0 +1,94 @@
+{
+  "name": "polydl",
+  "version": "0.2.3",
+  "description": "多平台短视频下载器（抖音 / 快手 ...）- Node.js/TypeScript 实现",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "bin": {
+    "pdl": "dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "cli": "tsx src/cli/index.ts",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "polydl",
+    "downloader",
+    "video",
+    "douyin",
+    "kuaishou",
+    "抖音",
+    "快手",
+    "multi-platform"
+  ],
+  "author": {
+    "name": "Everless321",
+    "email": "ever@everless.dev",
+    "url": "https://github.com/Everless321"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Everless321/PolyDL.git"
+  },
+  "homepage": "https://github.com/Everless321/PolyDL#readme",
+  "bugs": {
+    "url": "https://github.com/Everless321/PolyDL/issues"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.7.9",
+    "commander": "^13.1.0",
+    "conf": "^13.1.0",
+    "consola": "^3.4.0",
+    "crypto-js": "^4.2.0",
+    "got": "^14.4.5",
+    "jsonpath-plus": "^10.3.0",
+    "ora": "^8.1.1",
+    "p-limit": "^6.2.0",
+    "sm-crypto": "^0.4.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "@types/crypto-js": "^4.2.2",
+    "@types/node": "^22.10.7",
+    "eslint": "^9.18.0",
+    "prettier": "^3.4.2",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.21.0",
+    "vitest": "^3.0.4"
+  }
+}

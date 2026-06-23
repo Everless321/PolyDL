@@ -1,0 +1,17 @@
+node_modules/
+*.log
+.env
+.env.local
+.DS_Store
+coverage/
+.nyc_output/
+*.tsbuildinfo
+downloads/
+dist/
+.ace-tool/
+src/.ace-tool/
+
+# 本地调试 / 临时脚本（不进入公共仓库）
+/authors-new*.txt
+/test-collection.ts
+/test-userinfo-debug.ts
