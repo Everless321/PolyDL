@@ -1,11 +1,11 @@
-import { JSONModel } from './base.js'
+import { JSONModel, collectGetterNames } from './base.js'
 
 const REPLACE_PATTERN = /[^\u4e00-\u9fa5a-zA-Z0-9#]/g
 
 export function replaceT<T>(obj: T): T {
   if (Array.isArray(obj)) {
     return obj.map(item =>
-      typeof item === 'string' ? item.replace(REPLACE_PATTERN, '_') : (item || '')
+      typeof item === 'string' ? item.replace(REPLACE_PATTERN, '_') : item || ''
     ) as T
   }
 
@@ -87,18 +87,12 @@ export function filterToList<T extends JSONModel>(
 ): Record<string, unknown>[] {
   const { entriesPath, excludeFields, extraFields = [] } = options
 
-  const proto = Object.getPrototypeOf(filterInstance)
-  const propertyNames = Object.getOwnPropertyNames(proto)
+  const keys = collectGetterNames(filterInstance).filter(name => !excludeFields.includes(name))
 
-  const keys = propertyNames.filter(name => {
-    if (name.startsWith('_') || name === 'constructor') return false
-    if (excludeFields.includes(name)) return false
-    const descriptor = Object.getOwnPropertyDescriptor(proto, name)
-    return descriptor && typeof descriptor.get === 'function'
-  })
-
-  const entries = (filterInstance as unknown as { _getAttrValue: (path: string) => unknown[] })
-    ._getAttrValue(entriesPath) as unknown[] || []
+  const entries =
+    ((filterInstance as unknown as { _getAttrValue: (path: string) => unknown[] })._getAttrValue(
+      entriesPath
+    ) as unknown[]) || []
 
   const listDicts: Record<string, unknown>[] = []
 

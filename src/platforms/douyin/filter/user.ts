@@ -2,6 +2,10 @@ import { JSONModel } from './base.js'
 import { replaceT, timestamp2Str, filterToList } from './utils.js'
 
 export class UserProfileFilter extends JSONModel {
+  get statusCode(): number | null {
+    return this._getAttrValue('$.status_code')
+  }
+
   get avatarUrl(): string | null {
     return this._getAttrValue('$.user.avatar_larger.url_list[0]')
   }
@@ -76,7 +80,8 @@ export class UserProfileFilter extends JSONModel {
   }
 
   get roomId(): string | null {
-    return this._getAttrValue('$.user.room_id')
+    // 读 room_id_str（string）而非 room_id（number）：大 room_id 超过 JS 安全整数会丢精度
+    return this._getAttrValue('$.user.room_id_str')
   }
 
   get schoolName(): string | null {
@@ -171,7 +176,9 @@ export class UserFollowingFilter extends JSONModel {
   }
 
   get canShowComment(): boolean[] | null {
-    return this._getListAttrValue('$.followings[*].aweme_control.can_show_comment') as boolean[] | null
+    return this._getListAttrValue('$.followings[*].aweme_control.can_show_comment') as
+      | boolean[]
+      | null
   }
 
   get awemeCount(): number[] | null {
@@ -187,16 +194,22 @@ export class UserFollowingFilter extends JSONModel {
   }
 
   get secondaryPriority(): number[] | null {
-    return this._getListAttrValue('$.followings[*].following_list_secondary_information_struct.secondary_information_priority') as number[] | null
+    return this._getListAttrValue(
+      '$.followings[*].following_list_secondary_information_struct.secondary_information_priority'
+    ) as number[] | null
   }
 
   get secondaryText(): string[] | null {
-    const raw = this._getListAttrValue<string>('$.followings[*].following_list_secondary_information_struct.secondary_information_text') as string[] | null
+    const raw = this._getListAttrValue<string>(
+      '$.followings[*].following_list_secondary_information_struct.secondary_information_text'
+    ) as string[] | null
     return raw ? replaceT(raw) : null
   }
 
   get secondaryTextRaw(): string[] | null {
-    return this._getListAttrValue('$.followings[*].following_list_secondary_information_struct.secondary_information_text') as string[] | null
+    return this._getListAttrValue(
+      '$.followings[*].following_list_secondary_information_struct.secondary_information_text'
+    ) as string[] | null
   }
 
   get isBlock(): boolean[] | null {
@@ -249,7 +262,7 @@ export class UserFollowingFilter extends JSONModel {
   }
 
   get roomId(): string[] | null {
-    return this._getListAttrValue('$.followings[*].room_id') as string[] | null
+    return this._getListAttrValue('$.followings[*].room_id_str') as string[] | null
   }
 
   get secUid(): string[] | null {
@@ -285,12 +298,17 @@ export class UserFollowingFilter extends JSONModel {
     return filterToList(this, {
       entriesPath: '$.followings',
       excludeFields: [
-        'statusCode', 'statusMsg', 'hasMore', 'total', 'mixCount',
-        'offset', 'myselfUserId', 'maxTime', 'minTime'
+        'statusCode',
+        'statusMsg',
+        'hasMore',
+        'total',
+        'mixCount',
+        'offset',
+        'myselfUserId',
+        'maxTime',
+        'minTime',
       ],
-      extraFields: [
-        'hasMore', 'total', 'mixCount', 'offset', 'myselfUserId', 'maxTime', 'minTime'
-      ]
+      extraFields: ['hasMore', 'total', 'mixCount', 'offset', 'myselfUserId', 'maxTime', 'minTime'],
     })
   }
 }
@@ -317,7 +335,9 @@ export class UserFollowerFilter extends UserFollowingFilter {
   }
 
   override get canShowComment(): boolean[] | null {
-    return this._getListAttrValue('$.followers[*].aweme_control.can_show_comment') as boolean[] | null
+    return this._getListAttrValue('$.followers[*].aweme_control.can_show_comment') as
+      | boolean[]
+      | null
   }
 
   override get awemeCount(): number[] | null {
@@ -382,7 +402,7 @@ export class UserFollowerFilter extends UserFollowingFilter {
   }
 
   override get roomId(): string[] | null {
-    return this._getListAttrValue('$.followers[*].room_id') as string[] | null
+    return this._getListAttrValue('$.followers[*].room_id_str') as string[] | null
   }
 
   override get secUid(): string[] | null {
@@ -418,12 +438,17 @@ export class UserFollowerFilter extends UserFollowingFilter {
     return filterToList(this, {
       entriesPath: '$.followers',
       excludeFields: [
-        'statusCode', 'statusMsg', 'hasMore', 'total', 'mixCount',
-        'offset', 'myselfUserId', 'maxTime', 'minTime'
+        'statusCode',
+        'statusMsg',
+        'hasMore',
+        'total',
+        'mixCount',
+        'offset',
+        'myselfUserId',
+        'maxTime',
+        'minTime',
       ],
-      extraFields: [
-        'hasMore', 'total', 'mixCount', 'offset', 'myselfUserId', 'maxTime', 'minTime'
-      ]
+      extraFields: ['hasMore', 'total', 'mixCount', 'offset', 'myselfUserId', 'maxTime', 'minTime'],
     })
   }
 }

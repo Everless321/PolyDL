@@ -13,17 +13,26 @@ export interface HandlerConfig {
   maxCursor?: number
   pageCounts?: number
   maxCounts?: number
+  /** 日期范围过滤（字符串，如 "today" / "2024-01-01~2024-12-31"），用于下载器 */
   interval?: string
+  /** 分页请求间隔默认值（毫秒），作为所有生成器的 handler 级默认，可被单次调用 options.interval 覆盖 */
+  pageInterval?: number
   url?: string
   folderize?: boolean
 }
 
 export interface PaginationOptions {
   maxCursor?: number
+  /** 时间游标下界（时间戳）；仅对 `fetchUserPostVideos` 生效（对齐 f2，游标为时间戳），其他方法忽略 */
   minCursor?: number
   pageCounts?: number
   maxCounts?: number
+  /** 每页之间的请求间隔（毫秒），防止触发风控。默认 5000（5 秒），设 0 关闭 */
+  interval?: number
 }
+
+/** 分页默认请求间隔（毫秒），对齐 f2 默认 5 秒 */
+export const DEFAULT_PAGE_INTERVAL = 5000
 
 export interface FetchOptions {
   secUserId?: string

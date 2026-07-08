@@ -74,7 +74,7 @@ export class DouyinCrawler {
     }
 
     this.msTokenPromise = fetchRealMsToken()
-      .then((token) => {
+      .then(token => {
         this.msToken = token
         return token
       })
@@ -102,12 +102,16 @@ export class DouyinCrawler {
     return abogusModel2Endpoint(this.userAgent, baseEndpoint, paramsWithMsToken, body)
   }
 
-  private async fetchGetJson<T = unknown>(endpoint: string, maxRetries: number = 3): Promise<HttpResponse<T>> {
+  private async fetchGetJson<T = unknown>(
+    endpoint: string,
+    maxRetries: number = 3,
+    headers: Record<string, string> = this.headers
+  ): Promise<HttpResponse<T>> {
     let lastError: Error | null = null
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const response = await get<T>(endpoint, { headers: this.headers })
+        const response = await get<T>(endpoint, { headers })
 
         // 检查响应是否为空或无效
         if (response.data === null || response.data === undefined) {
@@ -145,25 +149,42 @@ export class DouyinCrawler {
    */
   async fetchUserProfile(secUserId: string): Promise<HttpResponse> {
     const params = createUserProfileParams(secUserId)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.USER_DETAIL, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_DETAIL,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
   /**
    * 获取用户作品列表
    */
-  async fetchUserPost(secUserId: string, maxCursor: number = 0, count: number = 18): Promise<HttpResponse> {
+  async fetchUserPost(
+    secUserId: string,
+    maxCursor: number = 0,
+    count: number = 18
+  ): Promise<HttpResponse> {
     const params = createUserPostParams(secUserId, maxCursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.USER_POST, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_POST,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
   /**
    * 获取用户喜欢列表
    */
-  async fetchUserLike(secUserId: string, maxCursor: number = 0, count: number = 18): Promise<HttpResponse> {
+  async fetchUserLike(
+    secUserId: string,
+    maxCursor: number = 0,
+    count: number = 18
+  ): Promise<HttpResponse> {
     const params = createUserLikeParams(secUserId, maxCursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.USER_FAVORITE_A, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_FAVORITE_A,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -173,7 +194,10 @@ export class DouyinCrawler {
    */
   async fetchUserCollection(cursor: number = 0, count: number = 18): Promise<HttpResponse> {
     const params = createUserCollectionParams(cursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.USER_COLLECTION, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_COLLECTION,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchPostJson(endpoint, params as unknown as Record<string, unknown>)
   }
 
@@ -182,16 +206,26 @@ export class DouyinCrawler {
    */
   async fetchUserCollects(cursor: number = 0, count: number = 18): Promise<HttpResponse> {
     const params = createUserCollectsParams(cursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.USER_COLLECTS, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_COLLECTS,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
   /**
    * 获取收藏夹作品
    */
-  async fetchUserCollectsVideo(collectsId: string, cursor: number = 0, count: number = 18): Promise<HttpResponse> {
+  async fetchUserCollectsVideo(
+    collectsId: string,
+    cursor: number = 0,
+    count: number = 18
+  ): Promise<HttpResponse> {
     const params = createUserCollectsVideoParams(collectsId, cursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.USER_COLLECTS_VIDEO, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_COLLECTS_VIDEO,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -200,7 +234,10 @@ export class DouyinCrawler {
    */
   async fetchUserMusicCollection(cursor: number = 0, count: number = 18): Promise<HttpResponse> {
     const params = createUserMusicCollectionParams(cursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.USER_MUSIC_COLLECTION, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_MUSIC_COLLECTION,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -209,7 +246,10 @@ export class DouyinCrawler {
    */
   async fetchUserMix(mixId: string, cursor: number = 0, count: number = 18): Promise<HttpResponse> {
     const params = createUserMixParams(mixId, cursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.MIX_AWEME, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.MIX_AWEME,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -218,7 +258,10 @@ export class DouyinCrawler {
    */
   async fetchFriendFeed(cursor: number = 0): Promise<HttpResponse> {
     const params = createFriendFeedParams(cursor)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.FRIEND_FEED, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.FRIEND_FEED,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -227,7 +270,10 @@ export class DouyinCrawler {
    */
   async fetchPostFeed(count: number = 10): Promise<HttpResponse> {
     const params = createPostFeedParams(count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.TAB_FEED, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.TAB_FEED,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -236,16 +282,26 @@ export class DouyinCrawler {
    */
   async fetchFollowFeed(cursor: number = 0, count: number = 20): Promise<HttpResponse> {
     const params = createFollowFeedParams(cursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.FOLLOW_FEED, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.FOLLOW_FEED,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
   /**
    * 获取相关推荐
    */
-  async fetchPostRelated(awemeId: string, filterGids: string = '', count: number = 20): Promise<HttpResponse> {
+  async fetchPostRelated(
+    awemeId: string,
+    filterGids: string = '',
+    count: number = 20
+  ): Promise<HttpResponse> {
     const params = createPostRelatedParams(awemeId, filterGids, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.POST_RELATED, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.POST_RELATED,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -254,16 +310,26 @@ export class DouyinCrawler {
    */
   async fetchPostDetail(awemeId: string): Promise<HttpResponse> {
     const params = createPostDetailParams(awemeId)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.POST_DETAIL, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.POST_DETAIL,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
   /**
    * 获取作品评论
    */
-  async fetchPostComment(awemeId: string, cursor: number = 0, count: number = 20): Promise<HttpResponse> {
+  async fetchPostComment(
+    awemeId: string,
+    cursor: number = 0,
+    count: number = 20
+  ): Promise<HttpResponse> {
     const params = createPostCommentParams(awemeId, cursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.POST_COMMENT, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.POST_COMMENT,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -277,7 +343,10 @@ export class DouyinCrawler {
     count: number = 3
   ): Promise<HttpResponse> {
     const params = createPostCommentReplyParams(itemId, commentId, cursor, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.POST_COMMENT_REPLY, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.POST_COMMENT_REPLY,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -291,8 +360,17 @@ export class DouyinCrawler {
     locateItemId: string = '',
     count: number = 10
   ): Promise<HttpResponse> {
-    const params = createPostLocateParams(secUserId, maxCursor, locateItemCursor, locateItemId, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.LOCATE_POST, params as unknown as Record<string, unknown>)
+    const params = createPostLocateParams(
+      secUserId,
+      maxCursor,
+      locateItemCursor,
+      locateItemId,
+      count
+    )
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.LOCATE_POST,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -301,7 +379,10 @@ export class DouyinCrawler {
    */
   async fetchUserLive(webRid: string, roomIdStr: string): Promise<HttpResponse> {
     const params = createUserLiveParams(webRid, roomIdStr)
-    const endpoint = `${ENDPOINTS.LIVE_INFO}?${toQueryString(params as unknown as Record<string, unknown>)}`
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.LIVE_INFO,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -310,8 +391,13 @@ export class DouyinCrawler {
    */
   async fetchUserLive2(roomId: string): Promise<HttpResponse> {
     const params = createUserLive2Params(roomId)
-    const endpoint = `${ENDPOINTS.LIVE_INFO_ROOM_ID}?${toQueryString(params as unknown as Record<string, unknown>)}`
-    return this.fetchGetJson(endpoint)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.LIVE_INFO_ROOM_ID,
+      params as unknown as Record<string, unknown>
+    )
+    // 临时清空 Cookie 避免 invalid session（对齐 f2 fetch_live_room_id）
+    const headersNoCookie = { ...this.headers, Cookie: '' }
+    return this.fetchGetJson(endpoint, 3, headersNoCookie)
   }
 
   /**
@@ -319,7 +405,10 @@ export class DouyinCrawler {
    */
   async fetchFollowingUserLive(): Promise<HttpResponse> {
     const params = createFollowingUserLiveParams()
-    const endpoint = await this.model2Endpoint(ENDPOINTS.FOLLOW_USER_LIVE, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.FOLLOW_USER_LIVE,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -328,7 +417,10 @@ export class DouyinCrawler {
    */
   async fetchSuggestWords(query: string, count: number = 8): Promise<HttpResponse> {
     const params = createSuggestWordParams(query, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.SUGGEST_WORDS, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.SUGGEST_WORDS,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -342,7 +434,10 @@ export class DouyinCrawler {
     count: number = 15
   ): Promise<HttpResponse> {
     const params = createPostSearchParams(keyword, filterSelected, offset, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.POST_SEARCH, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.POST_SEARCH,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -356,7 +451,10 @@ export class DouyinCrawler {
     count: number = 10
   ): Promise<HttpResponse> {
     const params = createHomePostSearchParams(keyword, fromUser, offset, count)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.HOME_POST_SEARCH, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.HOME_POST_SEARCH,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -371,7 +469,10 @@ export class DouyinCrawler {
     sourceType: number = 4
   ): Promise<HttpResponse> {
     const params = createUserFollowingParams(secUserId, userId, offset, count, sourceType)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.USER_FOLLOWING, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_FOLLOWING,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -386,7 +487,10 @@ export class DouyinCrawler {
     sourceType: number = 1
   ): Promise<HttpResponse> {
     const params = createUserFollowerParams(userId, secUserId, offset, count, sourceType)
-    const endpoint = await this.model2Endpoint(ENDPOINTS.USER_FOLLOWER, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_FOLLOWER,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -400,7 +504,10 @@ export class DouyinCrawler {
     internalExt: string = ''
   ): Promise<HttpResponse> {
     const params = createLiveImFetchParams(roomId, userUniqueId, cursor, internalExt)
-    const endpoint = `${ENDPOINTS.LIVE_IM_FETCH}?${toQueryString(params as unknown as Record<string, unknown>)}`
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.LIVE_IM_FETCH,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -409,7 +516,10 @@ export class DouyinCrawler {
    */
   async fetchUserLiveStatus(userIds: string): Promise<HttpResponse> {
     const params = createUserLiveStatusParams(userIds)
-    const endpoint = `${ENDPOINTS.USER_LIVE_STATUS}?${toQueryString(params as unknown as Record<string, unknown>)}`
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.USER_LIVE_STATUS,
+      params as unknown as Record<string, unknown>
+    )
     return this.fetchGetJson(endpoint)
   }
 
@@ -418,7 +528,10 @@ export class DouyinCrawler {
    */
   async fetchQueryUser(secUserIds: string = ''): Promise<HttpResponse> {
     const params = createQueryUserParams()
-    const endpoint = await this.model2Endpoint(ENDPOINTS.QUERY_USER, params as unknown as Record<string, unknown>)
+    const endpoint = await this.model2Endpoint(
+      ENDPOINTS.QUERY_USER,
+      params as unknown as Record<string, unknown>
+    )
 
     // 与 f2 对齐：默认 GET；保留旧语义，传入 sec_user_ids 时走 POST。
     if (!secUserIds.trim()) {
@@ -436,7 +549,11 @@ export class DouyinCrawler {
   /**
    * 获取作品统计
    */
-  async fetchPostStats(itemId: string, awemeType: number = 0, playDelta: number = 1): Promise<HttpResponse> {
+  async fetchPostStats(
+    itemId: string,
+    awemeType: number = 0,
+    playDelta: number = 1
+  ): Promise<HttpResponse> {
     const params = createPostStatsParams(itemId, awemeType, playDelta)
     const body = toQueryString(params as unknown as Record<string, unknown>)
     const endpoint = await this.model2Endpoint(

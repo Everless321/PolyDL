@@ -1,5 +1,28 @@
 import { JSONPath } from 'jsonpath-plus'
 
+/**
+ * 沿原型链收集实例上所有 getter 属性名（对齐 f2 的 `dir()` 语义）。
+ * 从最派生的原型向上遍历至 `Object.prototype`，子类覆写的 getter 优先（首次出现即保留）。
+ * 这样继承型 Filter 子类也能取到父类定义的 getter，避免 toDict/filterToList 输出残缺。
+ */
+export function collectGetterNames(instance: object): string[] {
+  const names = new Set<string>()
+  let proto = Object.getPrototypeOf(instance)
+
+  while (proto && proto !== Object.prototype) {
+    for (const name of Object.getOwnPropertyNames(proto)) {
+      if (name.startsWith('_') || name === 'constructor' || names.has(name)) continue
+      const descriptor = Object.getOwnPropertyDescriptor(proto, name)
+      if (descriptor && typeof descriptor.get === 'function') {
+        names.add(name)
+      }
+    }
+    proto = Object.getPrototypeOf(proto)
+  }
+
+  return [...names]
+}
+
 export class JSONModel<T = Record<string, unknown>> {
   protected _data: T
   private _cache: Map<string, unknown> = new Map()
@@ -26,7 +49,10 @@ export class JSONModel<T = Record<string, unknown>> {
     return result as R
   }
 
-  protected _getListAttrValue<R = unknown>(jsonpathExpr: string, asJson: boolean = false): R[] | string | null {
+  protected _getListAttrValue<R = unknown>(
+    jsonpathExpr: string,
+    asJson: boolean = false
+  ): R[] | string | null {
     const cacheKey = `list:${jsonpathExpr}:${asJson}`
     if (this._cache.has(cacheKey)) {
       return this._cache.get(cacheKey) as R[] | string | null
@@ -77,18 +103,12 @@ export class JSONModel<T = Record<string, unknown>> {
 
   toDict(): Record<string, unknown> {
     const result: Record<string, unknown> = {}
-    const proto = Object.getPrototypeOf(this)
-    const propertyNames = Object.getOwnPropertyNames(proto)
 
-    for (const name of propertyNames) {
-      if (name.startsWith('_') || name === 'constructor') continue
-      const descriptor = Object.getOwnPropertyDescriptor(proto, name)
-      if (descriptor && typeof descriptor.get === 'function') {
-        try {
-          result[name] = (this as Record<string, unknown>)[name]
-        } catch {
-          result[name] = null
-        }
+    for (const name of collectGetterNames(this)) {
+      try {
+        result[name] = (this as Record<string, unknown>)[name]
+      } catch {
+        result[name] = null
       }
     }
 

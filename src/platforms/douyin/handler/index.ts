@@ -5,6 +5,7 @@
 
 import { DouyinCrawler } from '../crawler/douyin.js'
 import { getAwemeId, fetchFromSharePage, SharePageDetail } from '../utils/fetcher.js'
+import { sleep } from '../utils/common.js'
 import {
   UserProfileFilter,
   UserPostFilter,
@@ -34,7 +35,9 @@ import {
   HandlerConfig,
   PaginationOptions,
   DY_LIVE_STATUS_MAPPING,
+  DEFAULT_PAGE_INTERVAL,
 } from './types.js'
+import { APIResponseError } from '../errors/index.js'
 
 export interface HandlerResult<T = Record<string, unknown>> {
   data: T | T[] | null
@@ -46,9 +49,12 @@ export interface HandlerResult<T = Record<string, unknown>> {
 export class DouyinHandler {
   private crawler: DouyinCrawler
   private hasCookie: boolean
+  /** handler 级分页间隔默认值（毫秒），单次调用的 options.interval 优先 */
+  private defaultInterval: number
 
   constructor(config: HandlerConfig) {
     this.hasCookie = !!config.cookie
+    this.defaultInterval = config.pageInterval ?? DEFAULT_PAGE_INTERVAL
     this.crawler = new DouyinCrawler({
       cookie: config.cookie || '',
       headers: config.headers,
@@ -57,11 +63,89 @@ export class DouyinHandler {
   }
 
   /**
-   * 获取用户资料
+   * 通用分页生成器：统一处理游标翻页、动态请求数量、请求间隔。
+   * 对齐 f2 handler 的分页行为，避免在各方法里重复相同的循环逻辑。
+   *
+   * @param config.fetchPage - 拉取单页并构造 Filter，入参为 (cursor, size)
+   * @param config.getNextCursor - 从 Filter 取下一页游标（maxCursor/cursor/offset）
+   * @param config.getItemCount - 从 Filter 取本页条目数，用于累计与终止判断
+   * @param config.minCursor - 时间游标下界；仅当游标为时间戳（maxCursor 类）时传入，翻到早于它的页即停止
    */
-  async fetchUserProfile(secUserId: string): Promise<UserProfileFilter> {
+  private async *paginate<F extends { hasMore: boolean | null }>(config: {
+    initialCursor: number
+    pageCounts: number
+    maxCounts: number
+    interval: number
+    minCursor?: number
+    fetchPage: (cursor: number, size: number) => Promise<F>
+    getNextCursor: (filter: F) => number | null
+    getItemCount: (filter: F) => number
+  }): AsyncGenerator<F, void, unknown> {
+    const {
+      initialCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      minCursor,
+      fetchPage,
+      getNextCursor,
+      getItemCount,
+    } = config
+    const cap = maxCounts > 0 ? maxCounts : Infinity
+    let cursor = initialCursor
+    let collected = 0
+
+    while (true) {
+      // 动态请求数量：最后一页只请求剩余所需数量（对齐 f2 min(page_counts, max_counts-collected)）
+      const size = cap === Infinity ? pageCounts : Math.min(pageCounts, cap - collected)
+      const filter = await fetchPage(cursor, size)
+
+      yield filter
+
+      if (!filter.hasMore) break
+
+      const nextCursor = getNextCursor(filter)
+      if (nextCursor === null || nextCursor === cursor) break
+      cursor = nextCursor
+
+      // 时间范围提前终止：游标翻到早于 minCursor 的作品即停止（对齐 f2 max_cursor < min_cursor）
+      if (minCursor && minCursor > 0 && cursor < minCursor) break
+
+      // 空页跳过：本页无内容但 has_more，直接翻到下一页，不计数、不等待（对齐 f2 has_aweme 分支）
+      const itemCount = getItemCount(filter)
+      if (itemCount === 0) continue
+
+      collected += itemCount
+      if (collected >= cap) break
+
+      // 请求间隔：仅在确定还要发下一次请求时等待，最后一页不产生多余延迟
+      if (interval > 0) await sleep(interval)
+    }
+  }
+
+  /**
+   * 获取用户资料
+   * @param secUserId - 用户 sec_uid
+   * @returns 用户信息过滤器；若为广告用户（status_code === 5）返回 null
+   */
+  async fetchUserProfile(secUserId: string): Promise<UserProfileFilter | null> {
+    if (!secUserId) {
+      throw new Error('`secUserId` 不能为空')
+    }
+
     const response = await this.crawler.fetchUserProfile(secUserId)
-    return new UserProfileFilter(response.data as Record<string, unknown>)
+    const user = new UserProfileFilter(response.data as Record<string, unknown>)
+
+    // status_code 为 5 说明是广告用户，跳过
+    if (user.statusCode === 5) {
+      return null
+    }
+
+    if (user.nickname === null) {
+      throw new APIResponseError('`fetchUserProfile` 请求失败，请更换 cookie 或稍后再试')
+    }
+
+    return user
   }
 
   /**
@@ -110,25 +194,26 @@ export class DouyinHandler {
     secUserId: string,
     options: PaginationOptions = {}
   ): AsyncGenerator<UserPostFilter, void, unknown> {
-    const { maxCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let cursor = maxCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchUserPost(secUserId, cursor, pageCounts)
-      const filter = new UserPostFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.maxCursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.awemeId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor = 0,
+      minCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<UserPostFilter>({
+      initialCursor: maxCursor,
+      minCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (cursor, size) => {
+        const response = await this.crawler.fetchUserPost(secUserId, cursor, size)
+        return new UserPostFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.maxCursor,
+      getItemCount: f => f.awemeId?.length || 0,
+    })
   }
 
   /**
@@ -138,25 +223,24 @@ export class DouyinHandler {
     secUserId: string,
     options: PaginationOptions = {}
   ): AsyncGenerator<UserLikeFilter, void, unknown> {
-    const { maxCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let cursor = maxCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchUserLike(secUserId, cursor, pageCounts)
-      const filter = new UserLikeFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.maxCursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.awemeId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<UserLikeFilter>({
+      initialCursor: maxCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (cursor, size) => {
+        const response = await this.crawler.fetchUserLike(secUserId, cursor, size)
+        return new UserLikeFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.maxCursor,
+      getItemCount: f => f.awemeId?.length || 0,
+    })
   }
 
   /**
@@ -165,50 +249,50 @@ export class DouyinHandler {
   async *fetchUserCollectionVideos(
     options: PaginationOptions = {}
   ): AsyncGenerator<UserCollectionFilter, void, unknown> {
-    const { maxCursor: initialCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let cursor = initialCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchUserCollection(cursor, pageCounts)
-      const filter = new UserCollectionFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.maxCursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.awemeId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor: initialCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<UserCollectionFilter>({
+      initialCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (cursor, size) => {
+        const response = await this.crawler.fetchUserCollection(cursor, size)
+        return new UserCollectionFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.maxCursor,
+      getItemCount: f => f.awemeId?.length || 0,
+    })
   }
 
   /**
    * 获取用户收藏夹列表（生成器）
    */
-  async *fetchUserCollects(options: PaginationOptions = {}): AsyncGenerator<UserCollectsFilter, void, unknown> {
-    const { maxCursor: initialCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let cursor = initialCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchUserCollects(cursor, pageCounts)
-      const filter = new UserCollectsFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.maxCursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.collectsId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+  async *fetchUserCollects(
+    options: PaginationOptions = {}
+  ): AsyncGenerator<UserCollectsFilter, void, unknown> {
+    const {
+      maxCursor: initialCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<UserCollectsFilter>({
+      initialCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (cursor, size) => {
+        const response = await this.crawler.fetchUserCollects(cursor, size)
+        return new UserCollectsFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.maxCursor,
+      getItemCount: f => f.collectsId?.length || 0,
+    })
   }
 
   /**
@@ -218,25 +302,24 @@ export class DouyinHandler {
     collectsId: string,
     options: PaginationOptions = {}
   ): AsyncGenerator<UserCollectsFilter, void, unknown> {
-    const { maxCursor: initialCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let cursor = initialCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchUserCollectsVideo(collectsId, cursor, pageCounts)
-      const filter = new UserCollectsFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.maxCursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.collectsId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor: initialCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<UserCollectsFilter>({
+      initialCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (cursor, size) => {
+        const response = await this.crawler.fetchUserCollectsVideo(collectsId, cursor, size)
+        return new UserCollectsFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.maxCursor,
+      getItemCount: f => f.collectsId?.length || 0,
+    })
   }
 
   /**
@@ -246,25 +329,24 @@ export class DouyinHandler {
     mixId: string,
     options: PaginationOptions = {}
   ): AsyncGenerator<UserMixFilter, void, unknown> {
-    const { maxCursor: initialCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let cursor = initialCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchUserMix(mixId, cursor, pageCounts)
-      const filter = new UserMixFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.maxCursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.awemeId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor: initialCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<UserMixFilter>({
+      initialCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (cursor, size) => {
+        const response = await this.crawler.fetchUserMix(mixId, cursor, size)
+        return new UserMixFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.maxCursor,
+      getItemCount: f => f.awemeId?.length || 0,
+    })
   }
 
   /**
@@ -273,25 +355,24 @@ export class DouyinHandler {
   async *fetchUserMusicCollection(
     options: PaginationOptions = {}
   ): AsyncGenerator<UserMusicCollectionFilter, void, unknown> {
-    const { maxCursor: initialCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let cursor = initialCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchUserMusicCollection(cursor, pageCounts)
-      const filter = new UserMusicCollectionFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.maxCursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.musicId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor: initialCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<UserMusicCollectionFilter>({
+      initialCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (cursor, size) => {
+        const response = await this.crawler.fetchUserMusicCollection(cursor, size)
+        return new UserMusicCollectionFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.maxCursor,
+      getItemCount: f => f.musicId?.length || 0,
+    })
   }
 
   /**
@@ -301,7 +382,7 @@ export class DouyinHandler {
     awemeId: string,
     options: PaginationOptions = {}
   ): AsyncGenerator<PostRelatedFilter, void, unknown> {
-    const { maxCounts = 0 } = options
+    const { maxCounts = 0, interval = this.defaultInterval } = options
     let filterGids = ''
     let count = 0
 
@@ -318,32 +399,35 @@ export class DouyinHandler {
 
       count += awemeIds.length
       if (maxCounts > 0 && count >= maxCounts) break
+
+      if (interval > 0) await sleep(interval)
     }
   }
 
   /**
    * 获取朋友作品（生成器）
    */
-  async *fetchFriendFeedVideos(options: PaginationOptions = {}): AsyncGenerator<FriendFeedFilter, void, unknown> {
-    const { maxCursor = 0, maxCounts = 0 } = options
-    let cursor = maxCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchFriendFeed(cursor)
-      const filter = new FriendFeedFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.cursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.awemeId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+  async *fetchFriendFeedVideos(
+    options: PaginationOptions = {}
+  ): AsyncGenerator<FriendFeedFilter, void, unknown> {
+    const {
+      maxCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<FriendFeedFilter>({
+      initialCursor: maxCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async cursor => {
+        const response = await this.crawler.fetchFriendFeed(cursor)
+        return new FriendFeedFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.cursor,
+      getItemCount: f => f.awemeId?.length || 0,
+    })
   }
 
   /**
@@ -398,25 +482,24 @@ export class DouyinHandler {
     awemeId: string,
     options: PaginationOptions = {}
   ): AsyncGenerator<PostCommentFilter, void, unknown> {
-    const { maxCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let cursor = maxCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchPostComment(awemeId, cursor, pageCounts)
-      const filter = new PostCommentFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.cursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.commentId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<PostCommentFilter>({
+      initialCursor: maxCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (cursor, size) => {
+        const response = await this.crawler.fetchPostComment(awemeId, cursor, size)
+        return new PostCommentFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.cursor,
+      getItemCount: f => f.commentId?.length || 0,
+    })
   }
 
   /**
@@ -427,25 +510,24 @@ export class DouyinHandler {
     commentId: string,
     options: PaginationOptions = {}
   ): AsyncGenerator<PostCommentReplyFilter, void, unknown> {
-    const { maxCursor = 0, pageCounts = 3, maxCounts = 0 } = options
-    let cursor = maxCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchPostCommentReply(itemId, commentId, cursor, pageCounts)
-      const filter = new PostCommentReplyFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.cursor
-      if (newCursor === null || newCursor === cursor) break
-      cursor = newCursor
-
-      count += filter.commentId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor = 0,
+      pageCounts = 3,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<PostCommentReplyFilter>({
+      initialCursor: maxCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (cursor, size) => {
+        const response = await this.crawler.fetchPostCommentReply(itemId, commentId, cursor, size)
+        return new PostCommentReplyFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.cursor,
+      getItemCount: f => f.commentId?.length || 0,
+    })
   }
 
   /**
@@ -456,25 +538,24 @@ export class DouyinHandler {
     fromUser: string,
     options: PaginationOptions = {}
   ): AsyncGenerator<HomePostSearchFilter, void, unknown> {
-    const { maxCursor = 0, pageCounts = 10, maxCounts = 0 } = options
-    let offset = maxCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchHomePostSearch(keyword, fromUser, offset, pageCounts)
-      const filter = new HomePostSearchFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newCursor = filter.cursor
-      if (newCursor === null || newCursor === offset) break
-      offset = newCursor
-
-      count += filter.awemeId?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor = 0,
+      pageCounts = 10,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<HomePostSearchFilter>({
+      initialCursor: maxCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (offset, size) => {
+        const response = await this.crawler.fetchHomePostSearch(keyword, fromUser, offset, size)
+        return new HomePostSearchFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.cursor,
+      getItemCount: f => f.awemeId?.length || 0,
+    })
   }
 
   /**
@@ -493,25 +574,24 @@ export class DouyinHandler {
     userId: string = '',
     options: PaginationOptions = {}
   ): AsyncGenerator<UserFollowingFilter, void, unknown> {
-    const { maxCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let offset = maxCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchUserFollowing(secUserId, userId, offset, pageCounts)
-      const filter = new UserFollowingFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newOffset = filter.offset
-      if (newOffset === null || newOffset === offset) break
-      offset = newOffset
-
-      count += filter.secUid?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<UserFollowingFilter>({
+      initialCursor: maxCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (offset, size) => {
+        const response = await this.crawler.fetchUserFollowing(secUserId, userId, offset, size)
+        return new UserFollowingFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.offset,
+      getItemCount: f => f.secUid?.length || 0,
+    })
   }
 
   /**
@@ -522,25 +602,24 @@ export class DouyinHandler {
     secUserId: string,
     options: PaginationOptions = {}
   ): AsyncGenerator<UserFollowerFilter, void, unknown> {
-    const { maxCursor = 0, pageCounts = 20, maxCounts = 0 } = options
-    let offset = maxCursor
-    let count = 0
-
-    while (true) {
-      const response = await this.crawler.fetchUserFollower(userId, secUserId, offset, pageCounts)
-      const filter = new UserFollowerFilter(response.data as Record<string, unknown>)
-
-      yield filter
-
-      if (!filter.hasMore) break
-
-      const newOffset = filter.offset
-      if (newOffset === null || newOffset === offset) break
-      offset = newOffset
-
-      count += filter.secUid?.length || 0
-      if (maxCounts > 0 && count >= maxCounts) break
-    }
+    const {
+      maxCursor = 0,
+      pageCounts = 20,
+      maxCounts = 0,
+      interval = this.defaultInterval,
+    } = options
+    yield* this.paginate<UserFollowerFilter>({
+      initialCursor: maxCursor,
+      pageCounts,
+      maxCounts,
+      interval,
+      fetchPage: async (offset, size) => {
+        const response = await this.crawler.fetchUserFollower(userId, secUserId, offset, size)
+        return new UserFollowerFilter(response.data as Record<string, unknown>)
+      },
+      getNextCursor: f => f.offset,
+      getItemCount: f => f.secUid?.length || 0,
+    })
   }
 
   /**
@@ -554,7 +633,11 @@ export class DouyinHandler {
   /**
    * 获取作品统计
    */
-  async fetchPostStats(itemId: string, awemeType: number = 0, playDelta: number = 1): Promise<PostStatsFilter> {
+  async fetchPostStats(
+    itemId: string,
+    awemeType: number = 0,
+    playDelta: number = 1
+  ): Promise<PostStatsFilter> {
     const response = await this.crawler.fetchPostStats(itemId, awemeType, playDelta)
     return new PostStatsFilter(response.data as Record<string, unknown>)
   }

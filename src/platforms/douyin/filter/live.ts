@@ -111,7 +111,8 @@ export class UserLive2Filter extends JSONModel {
   }
 
   get roomId(): string | null {
-    return this._getAttrValue('$.data.room.id')
+    // 读 id_str（string）而非 id（number）：大 room id 超过 JS 安全整数会丢精度
+    return this._getAttrValue('$.data.room.id_str')
   }
 
   get webRid(): string | null {
@@ -326,7 +327,9 @@ export class FollowingUserLiveFilter extends JSONModel {
   }
 
   get avatarThumb(): string[] | null {
-    return this._getListAttrValue('$.data.data.[*].room.owner.avatar_thumb.url_list[0]') as string[] | null
+    return this._getListAttrValue('$.data.data.[*].room.owner.avatar_thumb.url_list[0]') as
+      | string[]
+      | null
   }
 
   get userId(): string[] | null {
@@ -338,7 +341,9 @@ export class FollowingUserLiveFilter extends JSONModel {
   }
 
   get nickname(): string[] | null {
-    const raw = this._getListAttrValue<string>('$.data.data.[*].room.owner.nickname') as string[] | null
+    const raw = this._getListAttrValue<string>('$.data.data.[*].room.owner.nickname') as
+      | string[]
+      | null
     return raw ? replaceT(raw) : null
   }
 
@@ -347,22 +352,28 @@ export class FollowingUserLiveFilter extends JSONModel {
   }
 
   get flvPullUrl(): Record<string, string>[] | null {
-    return this._getListAttrValue('$.data.data.[*].room.stream_url.flv_pull_url') as Record<string, string>[] | null
+    return this._getListAttrValue('$.data.data.[*].room.stream_url.flv_pull_url') as
+      | Record<string, string>[]
+      | null
   }
 
   get hlsPullUrl(): Record<string, string>[] | null {
-    return this._getListAttrValue('$.data.data.[*].room.stream_url.hls_pull_url_map') as Record<string, string>[] | null
+    return this._getListAttrValue('$.data.data.[*].room.stream_url.hls_pull_url_map') as
+      | Record<string, string>[]
+      | null
   }
 
   get streamOrientation(): number[] | null {
-    return this._getListAttrValue('$.data.data.[*].room.stream_url.stream_orientation') as number[] | null
+    return this._getListAttrValue('$.data.data.[*].room.stream_url.stream_orientation') as
+      | number[]
+      | null
   }
 
   toList(): Record<string, unknown>[] {
     return filterToList(this, {
       entriesPath: '$.data.data',
       excludeFields: ['statusCode', 'statusMsg'],
-      extraFields: []
+      extraFields: [],
     })
   }
 }
