@@ -57,17 +57,28 @@ async function main() {
 
 function record(streamUrl: string, outFile: string, seconds: number): Promise<void> {
   return new Promise((resolve, reject) => {
-    const ff = spawn('ffmpeg', [
-      '-y',
-      '-headers', 'Referer: https://live.douyin.com/\r\n',
-      '-i', streamUrl,
-      '-t', String(seconds),
-      '-c', 'copy',
-      outFile,
-    ], { stdio: 'inherit' })
+    const ff = spawn(
+      'ffmpeg',
+      [
+        '-y',
+        '-headers',
+        'Referer: https://live.douyin.com/\r\n',
+        '-i',
+        streamUrl,
+        '-t',
+        String(seconds),
+        '-c',
+        'copy',
+        outFile,
+      ],
+      { stdio: 'inherit' }
+    )
     ff.on('error', reject)
     ff.on('close', code => (code === 0 ? resolve() : reject(new Error('ffmpeg 退出码 ' + code))))
   })
 }
 
-main().catch(e => { console.error('出错:', e?.message || e); process.exit(1) })
+main().catch(e => {
+  console.error('出错:', e?.message || e)
+  process.exit(1)
+})

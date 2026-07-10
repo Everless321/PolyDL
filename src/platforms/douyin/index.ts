@@ -8,6 +8,7 @@ export * from './filter/index.js'
 export * from './handler/index.js'
 export * from './utils/index.js'
 export * from './algorithm/index.js'
+export * from './live/index.js'
 
 // 从 model/types.js 导出不冲突的类型
 export type {

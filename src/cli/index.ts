@@ -12,7 +12,7 @@ import type { AwemeData } from '../platforms/douyin/downloader/types.js'
 
 const program = new Command()
 
-program.name('pdl').description('多平台短视频下载器（抖音 / 快手 ...）').version('0.3.0')
+program.name('pdl').description('多平台短视频下载器（抖音 / 快手 ...）').version('0.4.0')
 
 program
   .command('download <url>')

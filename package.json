@@ -1,6 +1,6 @@
 {
   "name": "polydl",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "多平台短视频下载器（抖音 / 快手 ...）- Node.js/TypeScript 实现",
   "type": "module",
   "main": "dist/index.cjs",
@@ -76,13 +76,16 @@
     "jsonpath-plus": "^10.3.0",
     "ora": "^8.1.1",
     "p-limit": "^6.2.0",
+    "protobufjs": "^8.7.0",
     "sm-crypto": "^0.4.0",
+    "ws": "^8.21.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.18.0",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.10.7",
+    "@types/ws": "^8.18.1",
     "eslint": "^9.18.0",
     "prettier": "^3.4.2",
     "tsup": "^8.3.5",

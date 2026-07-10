@@ -27,18 +27,31 @@ async function main() {
     console.log('该用户为广告用户或无效，跳过')
     return
   }
-  console.log(`昵称: ${profile.nickname} | 抖音号: ${profile.uniqueId} | 作品: ${profile.awemeCount} | 粉丝: ${profile.followerCount}`)
+  console.log(
+    `昵称: ${profile.nickname} | 抖音号: ${profile.uniqueId} | 作品: ${profile.awemeCount} | 粉丝: ${profile.followerCount}`
+  )
 
   // 3) 主页作品分页（AsyncGenerator，每次 yield 一页 Filter）
   let n = 0
-  for await (const page of handler.fetchUserPostVideos(secUserId, { pageCounts: 20, maxCounts: 20, interval: 0 })) {
+  for await (const page of handler.fetchUserPostVideos(secUserId, {
+    pageCounts: 20,
+    maxCounts: 20,
+    interval: 0,
+  })) {
     const ids = page.awemeId || []
     const descs = page.desc || []
     for (let i = 0; i < ids.length; i++) {
-      console.log(`#${++n}  ${ids[i]}  ${String(descs[i] ?? '').replace(/\n/g, ' ').slice(0, 40)}`)
+      console.log(
+        `#${++n}  ${ids[i]}  ${String(descs[i] ?? '')
+          .replace(/\n/g, ' ')
+          .slice(0, 40)}`
+      )
     }
   }
   console.log(`共 ${n} 条作品`)
 }
 
-main().catch(e => { console.error('出错:', e?.message || e); process.exit(1) })
+main().catch(e => {
+  console.error('出错:', e?.message || e)
+  process.exit(1)
+})

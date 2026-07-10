@@ -6,6 +6,7 @@
 import { DouyinCrawler } from '../crawler/douyin.js'
 import { getAwemeId, fetchFromSharePage, SharePageDetail } from '../utils/fetcher.js'
 import { sleep } from '../utils/common.js'
+import { streamLiveDanmaku, type DanmakuEvent } from '../live/danmaku.js'
 import {
   UserProfileFilter,
   UserPostFilter,
@@ -457,6 +458,49 @@ export class DouyinHandler {
   ): Promise<LiveImFetchFilter> {
     const response = await this.crawler.fetchLiveImFetch(roomId, userUniqueId, cursor, internalExt)
     return new LiveImFetchFilter(response.data as Record<string, unknown>)
+  }
+
+  /**
+   * 实时拉取直播弹幕（生成器）
+   * 内部完成 握手(fetchLiveImFetch) → 签名 → WSS 连接，持续产出结构化弹幕事件。
+   * 收到直播结束(control status=3) 或连接关闭即结束。
+   *
+   * @param roomId - 直播间 ID（精确 room_id 字符串）
+   * @param options.userUniqueId - 用户唯一 ID；不传则自动 fetchQueryUser 获取
+   * @param options.pingInterval - ws ping 间隔(ms)，默认 10000
+   * @param options.signal - AbortSignal，用于主动停止
+   *
+   * @example
+   * for await (const ev of handler.fetchLiveDanmaku(roomId)) {
+   *   if (ev.type === 'chat') console.log(ev.user.nickname, ev.content)
+   * }
+   */
+  async *fetchLiveDanmaku(
+    roomId: string,
+    options: { userUniqueId?: string; pingInterval?: number; signal?: AbortSignal } = {}
+  ): AsyncGenerator<DanmakuEvent, void, unknown> {
+    let uid = options.userUniqueId
+    if (!uid) {
+      const queryUser = await this.fetchQueryUser()
+      uid = queryUser.userUniqueId || ''
+    }
+    if (!uid) {
+      throw new Error('无法获取 user_unique_id（请传入 options.userUniqueId 或确保 cookie 有效）')
+    }
+
+    // 握手：拿到本次连接的 internal_ext + cursor
+    const im = await this.fetchLiveImFetch(roomId, uid)
+    const internalExt = im.internalExt || ''
+    const cursor = im.cursor || ''
+
+    yield* streamLiveDanmaku({
+      roomId,
+      userUniqueId: uid,
+      internalExt,
+      cursor,
+      pingInterval: options.pingInterval,
+      signal: options.signal,
+    })
   }
 
   /**
