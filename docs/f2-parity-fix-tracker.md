@@ -43,7 +43,7 @@
 | 14 | [ ] | `fetch_user_active_status` | 用户活跃状态批量查询 | `USER_ACTIVE_STATUS` | |
 | 15 | [ ] | `fetch_user_short_info` | 用户短信息批量查询 | （2026-01-30 新增） | |
 | 16 | [ ] | `fetch_live_user_rank` | 直播观众排行榜 | `LIVE_AUDIENCE_RANKING` | |
-| 17 | [ ] | `fetch_live_danmaku` | 直播弹幕流（WSS） | — | |
+| 17 | [x] | `fetch_live_danmaku` | 直播弹幕流（WSS） | LIVE_IM_WSS | 2026-07-10 完整移植 done：live/ 模块（ws+protobufjs+vm 签名），handler.fetchLiveDanmaku 生成器，真实直播间验证通过。发布 0.4.0 | |
 | 18 | [ ] | `fetch_live_chat_send` | 发送直播弹幕 | `LIVE_CHAT_SEND` | |
 | 19 | [ ] | `fetch_post_danmaku` | 视频弹幕列表 | `POST_DANMAKU_LIST` | |
 | 20 | [ ] | `fetch_post_time_danmaku` | 视频时间轴弹幕 | `POST_TIME_DANMAKU` | |

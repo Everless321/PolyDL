@@ -40,7 +40,9 @@ async function main() {
   const controller = new AbortController()
   process.on('SIGINT', () => controller.abort())
 
-  for await (const ev of handler.fetchLiveDanmaku(status.roomIdStr, { signal: controller.signal })) {
+  for await (const ev of handler.fetchLiveDanmaku(status.roomIdStr, {
+    signal: controller.signal,
+  })) {
     switch (ev.type) {
       case 'chat':
         console.log(`💬 ${ev.user.nickname}: ${ev.content}`)
@@ -69,4 +71,7 @@ async function main() {
   console.log('\n弹幕流结束')
 }
 
-main().catch(e => { console.error('出错:', e?.message || e); process.exit(1) })
+main().catch(e => {
+  console.error('出错:', e?.message || e)
+  process.exit(1)
+})

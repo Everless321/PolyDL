@@ -30,9 +30,16 @@ export interface DanmakuUser {
   avatar: string | null
 }
 
-export type DanmakuEvent =
+export type DanmakuEventBody =
   | { type: 'chat'; user: DanmakuUser; content: string }
-  | { type: 'gift'; user: DanmakuUser; giftId: string; giftName: string | null; comboCount: number; totalCount: number }
+  | {
+      type: 'gift'
+      user: DanmakuUser
+      giftId: string
+      giftName: string | null
+      comboCount: number
+      totalCount: number
+    }
   | { type: 'like'; user: DanmakuUser; count: number; total: number }
   | { type: 'member'; user: DanmakuUser; memberCount: string | null } // 进场
   | { type: 'social'; user: DanmakuUser; followCount: number } // 关注/分享
@@ -40,6 +47,16 @@ export type DanmakuEvent =
   | { type: 'roomStats'; displayLong: string | null; total: number }
   | { type: 'control'; status: number } // 3 = 直播结束
   | { type: 'raw'; method: string; payload: Uint8Array }
+
+/** 每个弹幕事件都带的时间元信息，用于和录制视频对齐 */
+export interface DanmakuMeta {
+  /** 帧到达本地墙钟时间（epoch ms）。对齐录制视频的主依据 */
+  receivedAt: number
+  /** 消息服务端创建时间（来自 Common.create_time，epoch ms；raw 类型或缺失为 null） */
+  createTime: number | null
+}
+
+export type DanmakuEvent = DanmakuEventBody & DanmakuMeta
 
 export interface DecodedFrame {
   needAck: boolean
@@ -74,16 +91,39 @@ function extractUser(u: Record<string, unknown> | undefined | null): DanmakuUser
   }
 }
 
-function decodeMessage(method: string, payload: Uint8Array): DanmakuEvent {
+function extractCreateTime(m: Record<string, unknown>): number | null {
+  const common = m.common as { createTime?: unknown } | undefined
+  if (!common || common.createTime == null) return null
+  const t = toNum(common.createTime)
+  return t > 0 ? t : null
+}
+
+function decodeMessage(
+  method: string,
+  payload: Uint8Array
+): { body: DanmakuEventBody; createTime: number | null } {
   const typeName = MESSAGE_TYPES[method]
-  if (!typeName) return { type: 'raw', method, payload }
+  if (!typeName) return { body: { type: 'raw', method, payload }, createTime: null }
 
   const T = root.lookupType(typeName)
   const m = T.decode(payload) as unknown as Record<string, unknown>
+  const createTime = extractCreateTime(m)
+  const body = decodeBody(method, m, payload)
+  return { body, createTime }
+}
 
+function decodeBody(
+  method: string,
+  m: Record<string, unknown>,
+  payload: Uint8Array
+): DanmakuEventBody {
   switch (method) {
     case 'WebcastChatMessage':
-      return { type: 'chat', user: extractUser(m.user as never), content: (m.content as string) || '' }
+      return {
+        type: 'chat',
+        user: extractUser(m.user as never),
+        content: (m.content as string) || '',
+      }
     case 'WebcastGiftMessage': {
       const gift = m.gift as { name?: string } | undefined
       return {
@@ -96,15 +136,32 @@ function decodeMessage(method: string, payload: Uint8Array): DanmakuEvent {
       }
     }
     case 'WebcastLikeMessage':
-      return { type: 'like', user: extractUser(m.user as never), count: toNum(m.count), total: toNum(m.total) }
+      return {
+        type: 'like',
+        user: extractUser(m.user as never),
+        count: toNum(m.count),
+        total: toNum(m.total),
+      }
     case 'WebcastMemberMessage':
-      return { type: 'member', user: extractUser(m.user as never), memberCount: (m.memberCount as string) || null }
+      return {
+        type: 'member',
+        user: extractUser(m.user as never),
+        memberCount: (m.memberCount as string) || null,
+      }
     case 'WebcastSocialMessage':
-      return { type: 'social', user: extractUser(m.user as never), followCount: toNum(m.followCount) }
+      return {
+        type: 'social',
+        user: extractUser(m.user as never),
+        followCount: toNum(m.followCount),
+      }
     case 'WebcastRoomUserSeqMessage':
       return { type: 'roomUserSeq', total: toNum(m.total), totalUser: toNum(m.totalUser) }
     case 'WebcastRoomStatsMessage':
-      return { type: 'roomStats', displayLong: (m.displayLong as string) || null, total: toNum(m.total) }
+      return {
+        type: 'roomStats',
+        displayLong: (m.displayLong as string) || null,
+        total: toNum(m.total),
+      }
     case 'WebcastControlMessage':
       return { type: 'control', status: toNum(m.status) }
     default:
@@ -112,8 +169,11 @@ function decodeMessage(method: string, payload: Uint8Array): DanmakuEvent {
   }
 }
 
-/** 解码一个 WSS 二进制帧 */
-export function decodeFrame(buffer: Buffer): DecodedFrame {
+/**
+ * 解码一个 WSS 二进制帧
+ * @param receivedAt 帧到达墙钟时间（epoch ms），默认 Date.now()；用于和录制视频对齐
+ */
+export function decodeFrame(buffer: Buffer, receivedAt: number = Date.now()): DecodedFrame {
   const frame = PushFrame.decode(buffer) as unknown as Record<string, unknown>
   const rawPayload = frame.payload as Uint8Array
 
@@ -135,9 +195,10 @@ export function decodeFrame(buffer: Buffer): DecodedFrame {
     const payload = msg.payload as Uint8Array
     if (!method || !payload) continue
     try {
-      events.push(decodeMessage(method, payload))
+      const { body, createTime } = decodeMessage(method, payload)
+      events.push({ ...body, receivedAt, createTime })
     } catch {
-      events.push({ type: 'raw', method, payload })
+      events.push({ type: 'raw', method, payload, receivedAt, createTime: null })
     }
   }
 

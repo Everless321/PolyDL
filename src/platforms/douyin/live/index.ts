@@ -8,6 +8,8 @@ export {
   buildAckFrame,
   buildPingFrame,
   type DanmakuEvent,
+  type DanmakuEventBody,
+  type DanmakuMeta,
   type DanmakuUser,
   type DecodedFrame,
 } from './message-parser.js'
