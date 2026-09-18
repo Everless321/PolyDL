@@ -1,4 +1,5 @@
 import crypto from 'node:crypto'
+import { getUserAgent } from '../config/index.js'
 
 const CHAR_TABLE =
   'Dkdpgh4ZKsQB80/Mfvw36XI1R25-WUAlEi7NLboqYTOPuzmFjJnryx9HVGcaStCe='
@@ -88,9 +89,7 @@ export interface XBogusResult {
 }
 
 export function getXBogus(urlParams: string, userAgent?: string): XBogusResult {
-  const ua =
-    userAgent ||
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
+  const ua = userAgent || getUserAgent()
 
   const encryptedUa = rc4Encrypt(UA_KEY, Buffer.from(ua, 'latin1'))
   const base64Ua = encryptedUa.toString('base64')

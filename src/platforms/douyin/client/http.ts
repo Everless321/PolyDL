@@ -1,4 +1,5 @@
-import { getConfig } from '../config/index.js'
+import { getConfig, getDevice, getUserAgent } from '../config/index.js'
+import { clientHintsOf } from '../device/profile.js'
 import {
   APIConnectionError,
   APITimeoutError,
@@ -60,21 +61,21 @@ export async function request<T = unknown>(
   const config = getConfig()
   const { method = 'GET', headers = {}, body, timeout = config.timeout, followRedirects = true } = options
 
+  const device = getDevice()
+
   const controller = new AbortController()
   const timeoutId = setTimeout(() => controller.abort(), timeout)
 
   const fetchOptions: RequestInit = {
     method,
     headers: {
-      'User-Agent': config.userAgent,
+      'User-Agent': getUserAgent(),
       'Referer': config.referer,
       'Accept': 'application/json, text/plain, */*',
-      'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+      'Accept-Language': `${device.language},zh;q=0.9,en;q=0.8`,
       'Accept-Encoding': 'gzip, deflate, br',
       'Origin': 'https://www.douyin.com',
-      'Sec-Ch-Ua': '"Microsoft Edge";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
-      'Sec-Ch-Ua-Mobile': '?0',
-      'Sec-Ch-Ua-Platform': '"Windows"',
+      ...clientHintsOf(device),
       'Sec-Fetch-Dest': 'empty',
       'Sec-Fetch-Mode': 'cors',
       'Sec-Fetch-Site': 'same-origin',

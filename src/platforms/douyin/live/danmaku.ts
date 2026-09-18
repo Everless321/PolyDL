@@ -4,7 +4,7 @@
  * 每帧回 ack 保活 → 按类型产出事件；收到 control(status=3) 或连接关闭即结束。
  */
 import WebSocket from 'ws'
-import { getConfig } from '../config/index.js'
+import { getUserAgent } from '../config/index.js'
 import { genTtwid } from '../utils/token.js'
 import { toQueryString, createLiveWebcastParams } from '../model/request.js'
 import { ENDPOINTS } from '../api/endpoints.js'
@@ -38,7 +38,7 @@ export async function* streamLiveDanmaku(
   options: LiveDanmakuOptions
 ): AsyncGenerator<DanmakuEvent, void, unknown> {
   const { roomId, userUniqueId, internalExt, cursor, signal } = options
-  const ua = options.userAgent || getConfig().userAgent
+  const ua = options.userAgent || getUserAgent()
   const pingInterval = options.pingInterval ?? 10000
 
   const ttwid = await genTtwid()
@@ -47,7 +47,11 @@ export async function* streamLiveDanmaku(
   const url = `${ENDPOINTS.LIVE_IM_WSS}?${toQueryString(params as unknown as Record<string, unknown>)}`
 
   const ws = new WebSocket(url, {
-    headers: { Cookie: `ttwid=${ttwid}`, 'User-Agent': ua },
+    headers: {
+      Cookie: `ttwid=${ttwid}`,
+      'User-Agent': ua,
+      Origin: 'https://live.douyin.com',
+    },
   })
   ws.binaryType = 'nodebuffer'
 

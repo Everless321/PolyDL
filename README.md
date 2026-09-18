@@ -59,6 +59,8 @@ pdl user --help
 | `--cover` | 下载封面 |
 | `--music` | 下载音乐 |
 | `--desc` | 下载文案 |
+| `--device-os <os>` | 设备指纹平台：`mac` / `windows`（默认跟随本机） |
+| `--device-seed <seed>` | 设备指纹随机种子，同一 seed 复现同一台设备 |
 
 ## 程序化调用
 
@@ -148,6 +150,7 @@ console.log(profile.totalFavorited)
 | `cover` | boolean | `false` | 下载封面 |
 | `desc` | boolean | `false` | 下载文案 |
 | `lyric` | boolean | `false` | 下载歌词 |
+| `device` | DeviceProfile | 全局配置 | 该实例专用的设备指纹，见「设备指纹」 |
 
 ### 命名模板变量
 
@@ -170,6 +173,50 @@ console.log(profile.totalFavorited)
 | 音乐 | `.mp3` | 背景音乐 |
 | 文案 | `.txt` | 作品描述 |
 | 歌词 | `.lrc` | 音乐歌词 |
+
+## 设备指纹（DeviceProfile）
+
+UA、Client Hints（`Sec-Ch-Ua*`）、请求参数（`browser_*` / `os_*` / `screen_*`）、A-Bogus 窗口指纹
+都从同一份 `DeviceProfile` 派生，保证一次会话内**自洽且稳定**，不同用户之间**互不相同**。
+
+不做任何配置时，进程启动会按本机平台随机生成一份 profile（近期 Chrome 版本 + 常见分辨率），
+同一进程内保持不变。
+
+```typescript
+import { setConfig, createDeviceProfile } from 'polydl'
+
+// 生成一份可复现的设备指纹并持久化（推荐把 seed 存起来）
+const device = createDeviceProfile({
+  os: 'mac',              // 'mac' | 'windows'，默认按 process.platform
+  browser: 'chrome',      // 'chrome' | 'edge'，默认 chrome
+  screen: { width: 1512, height: 982 },
+  cpuCores: 10,
+  deviceMemory: 8,        // navigator.deviceMemory 上限为 8
+  seed: 'your-machine-id' // 同一 seed 得到完全相同的 profile
+})
+
+setConfig({ cookie, device })
+```
+
+**为什么要让 Cookie 与指纹同源**：Cookie 是在某个浏览器环境里登录拿到的。
+如果登录环境是 Mac Chrome、而请求自报 Windows Edge，两者不一致极易被风控识别。
+把登录窗口和后续 API 请求用同一份 `DeviceProfile`（同一 UA）即可避免。
+
+按实例覆盖（多账号一账号一指纹）：
+
+```typescript
+new DouyinHandler({ cookie: cookieA, device: deviceA })
+new DouyinDownloader({ cookie: cookieA, device: deviceA })
+```
+
+派生函数：`userAgentOf` / `clientHintsOf` / `webRequestParamsOf` / `webcastParamsOf`，
+以及从 UA 反推 profile 的 `deviceFromUserAgent`。
+
+> 旧用法 `setConfig({ userAgent })` 仍然可用：内部会反推成 `DeviceProfile`，
+> Client Hints 与请求参数随之变成对应的平台与版本。
+> `DEFAULT_USER_AGENT` 与 `generateBrowserFingerprint` 已废弃。
+>
+> `LATEST_CHROME_MAJOR` 需随 Chrome 发版更新（当前 154，核实于 2026-09-18）。
 
 ## API 参考
 

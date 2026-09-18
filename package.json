@@ -1,6 +1,6 @@
 {
   "name": "polydl",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "多平台短视频下载器（抖音 / 快手 ...）- Node.js/TypeScript 实现",
   "type": "module",
   "main": "dist/index.cjs",

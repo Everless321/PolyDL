@@ -1,3 +1,6 @@
+import { getDevice } from '../config/index.js'
+import { webRequestParamsOf, webcastParamsOf } from '../device/profile.js'
+
 export interface BaseRequestParams {
   device_platform: string
   aid: string
@@ -83,29 +86,30 @@ export interface BaseWebCastParams {
 }
 
 function getBaseRequestParams(): BaseRequestParams {
+  const d = webRequestParamsOf(getDevice())
   return {
     device_platform: 'webapp',
     aid: '6383',
     channel: 'channel_pc_web',
     pc_client_type: 1,
     publish_video_strategy_type: 2,
-    pc_libra_divert: 'Windows',
+    pc_libra_divert: d.pc_libra_divert,
     version_code: '290100',
     version_name: '29.1.0',
     cookie_enabled: 'true',
-    screen_width: 1920,
-    screen_height: 1080,
-    browser_language: 'zh-CN',
-    browser_platform: 'Win32',
-    browser_name: 'Edge',
-    browser_version: '131.0.0.0',
+    screen_width: d.screen_width,
+    screen_height: d.screen_height,
+    browser_language: d.browser_language,
+    browser_platform: d.browser_platform,
+    browser_name: d.browser_name,
+    browser_version: d.browser_version,
     browser_online: 'true',
-    engine_name: 'Blink',
-    engine_version: '131.0.0.0',
-    os_name: 'Windows',
-    os_version: '10',
-    cpu_core_num: 12,
-    device_memory: 8,
+    engine_name: d.engine_name,
+    engine_version: d.engine_version,
+    os_name: d.os_name,
+    os_version: d.os_version,
+    cpu_core_num: d.cpu_core_num,
+    device_memory: d.device_memory,
     platform: 'PC',
     downlink: 10,
     effective_type: '4g',
@@ -115,19 +119,21 @@ function getBaseRequestParams(): BaseRequestParams {
 }
 
 function getBaseLiveParams(): BaseLiveParams {
+  const device = getDevice()
+  const d = webRequestParamsOf(device)
   return {
     aid: '6383',
     app_name: 'douyin_web',
     live_id: 1,
     device_platform: 'web',
-    language: 'zh-CN',
+    language: device.language,
     cookie_enabled: 'true',
-    screen_width: 1920,
-    screen_height: 1080,
-    browser_language: 'zh-CN',
-    browser_platform: 'Win32',
-    browser_name: 'Edge',
-    browser_version: '131.0.0.0',
+    screen_width: d.screen_width,
+    screen_height: d.screen_height,
+    browser_language: d.browser_language,
+    browser_platform: d.browser_platform,
+    browser_name: d.browser_name,
+    browser_version: d.browser_version,
     enter_source: '',
     is_need_double_stream: 'false',
     insert_task_id: '',
@@ -148,21 +154,20 @@ function getBaseLiveParams2(): BaseLiveParams2 {
 }
 
 function getBaseWebCastParams(): BaseWebCastParams {
+  const d = webcastParamsOf(getDevice())
   return {
     app_name: 'douyin_web',
     version_code: '180800',
     device_platform: 'web',
     cookie_enabled: 'true',
-    screen_width: 1920,
-    screen_height: 1080,
-    browser_language: 'zh-CN',
-    browser_platform: 'Win32',
-    browser_name: 'Mozilla',
-    browser_version: encodeURIComponent(
-      '5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
-    ),
+    screen_width: d.screen_width,
+    screen_height: d.screen_height,
+    browser_language: d.browser_language,
+    browser_platform: d.browser_platform,
+    browser_name: d.browser_name,
+    browser_version: d.browser_version,
     browser_online: 'true',
-    tz_name: 'Asia/Hong_Kong',
+    tz_name: d.tz_name,
     host: 'https://live.douyin.com',
     aid: 6383,
     live_id: 1,

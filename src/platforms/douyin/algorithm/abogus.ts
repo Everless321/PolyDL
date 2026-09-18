@@ -1,4 +1,6 @@
 import smCrypto from 'sm-crypto'
+import { getDevice, getUserAgent } from '../config/index.js'
+import { generateBrowserFingerprint } from '../device/profile.js'
 const { sm3 } = smCrypto
 
 const CHARACTER = 'Dkdpgh2ZmsQB80/MfvV36XI1R45-WUAlEixNLwoqYTOPuzKFjJnry79HbGcaStCe'
@@ -194,21 +196,6 @@ function transformBytes(bytesList: number[], bigArray: number[]): string {
   return resultStr.join('')
 }
 
-function generateBrowserFingerprint(platform: string = 'Win32'): string {
-  const innerWidth = 1024 + Math.floor(Math.random() * 896)
-  const innerHeight = 768 + Math.floor(Math.random() * 312)
-  const outerWidth = innerWidth + 24 + Math.floor(Math.random() * 8)
-  const outerHeight = innerHeight + 75 + Math.floor(Math.random() * 15)
-  const screenX = 0
-  const screenY = Math.random() > 0.5 ? 0 : 30
-  const sizeWidth = 1024 + Math.floor(Math.random() * 896)
-  const sizeHeight = 768 + Math.floor(Math.random() * 312)
-  const availWidth = 1280 + Math.floor(Math.random() * 640)
-  const availHeight = 800 + Math.floor(Math.random() * 280)
-
-  return `${innerWidth}|${innerHeight}|${outerWidth}|${outerHeight}|${screenX}|${screenY}|0|0|${sizeWidth}|${sizeHeight}|${availWidth}|${availHeight}|${innerWidth}|${innerHeight}|24|24|${platform}`
-}
-
 export interface ABogusResult {
   params: string
   abogus: string
@@ -227,10 +214,8 @@ export function getABogus(
   body: string = '',
   opts: ABogusOptions = {}
 ): ABogusResult {
-  const userAgent =
-    opts.userAgent ||
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
-  const browserFp = opts.fingerprint || generateBrowserFingerprint('Win32')
+  const userAgent = opts.userAgent || getUserAgent()
+  const browserFp = opts.fingerprint || getDevice().windowFingerprint
   const requestOptions = opts.options || [0, 1, 14]
 
   const salt = 'cus'

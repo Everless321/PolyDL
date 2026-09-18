@@ -1,7 +1,8 @@
 export { getXBogus, type XBogusResult } from './xbogus.js'
-export { getABogus, generateBrowserFingerprint, type ABogusResult, type ABogusOptions } from './abogus.js'
+export { getABogus, type ABogusResult, type ABogusOptions } from './abogus.js'
+export { generateBrowserFingerprint } from '../device/profile.js'
 
-import { getConfig } from '../config/index.js'
+import { getConfig, getUserAgent } from '../config/index.js'
 
 export function generateFakeMsToken(length: number = 128): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -29,7 +30,7 @@ export async function fetchRealMsToken(): Promise<string> {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
-      'User-Agent': config.userAgent,
+      'User-Agent': getUserAgent(),
     },
     body: JSON.stringify(payload),
   })

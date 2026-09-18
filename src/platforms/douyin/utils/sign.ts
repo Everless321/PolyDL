@@ -1,6 +1,6 @@
 import { getXBogus } from '../algorithm/xbogus.js'
-import { getABogus, generateBrowserFingerprint } from '../algorithm/abogus.js'
-import { getUserAgent, getEncryption } from '../config/index.js'
+import { getABogus } from '../algorithm/abogus.js'
+import { getUserAgent, getEncryption, getDevice } from '../config/index.js'
 
 export function signWithXBogus(params: string, userAgent?: string): string {
   const ua = userAgent || getUserAgent()
@@ -8,12 +8,15 @@ export function signWithXBogus(params: string, userAgent?: string): string {
   return result.params
 }
 
-export function signWithABogus(params: string, body: string = '', userAgent?: string): string {
-  const ua = userAgent || getUserAgent()
-  const fingerprint = generateBrowserFingerprint('Win32')
+export function signWithABogus(
+  params: string,
+  body: string = '',
+  userAgent?: string,
+  fingerprint?: string
+): string {
   const result = getABogus(params, body, {
-    userAgent: ua,
-    fingerprint,
+    userAgent: userAgent || getUserAgent(),
+    fingerprint: fingerprint || getDevice().windowFingerprint,
   })
   return result.params
 }
@@ -59,11 +62,15 @@ export function xbogusModel2Endpoint(
   return `${baseEndpoint}${separator}${paramStr}&X-Bogus=${result.xbogus}`
 }
 
-export function abogusStr2Endpoint(userAgent: string, params: string, body: string = ''): string {
-  const fingerprint = generateBrowserFingerprint('Win32')
+export function abogusStr2Endpoint(
+  userAgent: string,
+  params: string,
+  body: string = '',
+  fingerprint?: string
+): string {
   const result = getABogus(params, body, {
     userAgent,
-    fingerprint,
+    fingerprint: fingerprint || getDevice().windowFingerprint,
   })
   return result.params
 }
@@ -72,7 +79,8 @@ export function abogusModel2Endpoint(
   userAgent: string,
   baseEndpoint: string,
   params: Record<string, unknown>,
-  body: string = ''
+  body: string = '',
+  fingerprint?: string
 ): string {
   if (typeof params !== 'object' || params === null) {
     throw new TypeError('参数必须是对象类型')
@@ -82,10 +90,9 @@ export function abogusModel2Endpoint(
     .map(([k, v]) => `${k}=${v}`)
     .join('&')
 
-  const fingerprint = generateBrowserFingerprint('Win32')
   const result = getABogus(paramStr, body, {
     userAgent,
-    fingerprint,
+    fingerprint: fingerprint || getDevice().windowFingerprint,
   })
 
   const separator = baseEndpoint.includes('?') ? '&' : '?'

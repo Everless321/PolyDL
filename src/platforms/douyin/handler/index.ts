@@ -60,6 +60,7 @@ export class DouyinHandler {
       cookie: config.cookie || '',
       headers: config.headers,
       proxies: config.proxies,
+      device: config.device,
     })
   }
 

@@ -2,6 +2,7 @@ import type { Platform } from '../../platform.js'
 
 export * from './api/index.js'
 export * from './config/index.js'
+export * from './device/index.js'
 export * from './crawler/index.js'
 export * from './downloader/index.js'
 export * from './filter/index.js'

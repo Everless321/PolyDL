@@ -361,6 +361,7 @@ export interface SharePageDetail {
 
 export async function fetchFromSharePage(awemeId: string): Promise<SharePageDetail | null> {
   const shareUrl = `https://www.iesdouyin.com/share/video/${awemeId}/`
+  // 分享页是移动端兜底路径，故意用移动 UA，与全局 PC device 指纹无关
   const mobileUA = 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
 
   const response = await get<string>(shareUrl, {

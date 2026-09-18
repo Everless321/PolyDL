@@ -1,11 +1,25 @@
 import { z } from 'zod'
+import {
+  DeviceProfileSchema,
+  createDeviceProfile,
+  deviceFromUserAgent,
+  userAgentOf,
+  type DeviceProfile,
+} from '../device/profile.js'
 
+/**
+ * @deprecated 默认 UA 不再是常量，改由 `getDevice()` 派生。
+ * 仅为兼容旧的 `import { DEFAULT_USER_AGENT }` 保留。
+ */
 const DEFAULT_USER_AGENT =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0'
 
 export const ConfigSchema = z.object({
   cookie: z.string().default(''),
-  userAgent: z.string().default(DEFAULT_USER_AGENT),
+  /** @deprecated 改用 `device`；仍然可用，内部会反推成 DeviceProfile */
+  userAgent: z.string().default(''),
+  /** 设备指纹，UA / Client Hints / 请求参数 / A-Bogus 指纹的单一事实来源 */
+  device: DeviceProfileSchema.optional(),
   referer: z.string().default('https://www.douyin.com/'),
   downloadPath: z.string().default('./downloads'),
   maxConcurrency: z.number().min(1).max(10).default(3),
@@ -64,26 +78,45 @@ export const ConfigSchema = z.object({
         app_id: 6383,
         referer: 'https://www.douyin.com/',
         url: 'https://www.douyin.com/',
-        user_agent: DEFAULT_USER_AGENT,
+        // 实际请求时由 genWebid() 用当前 device 的 UA 覆盖
+        user_agent: '',
       },
     }),
 })
 
 export type Config = z.infer<typeof ConfigSchema>
 
-let currentConfig: Config = ConfigSchema.parse({})
+let currentDevice: DeviceProfile = createDeviceProfile()
+let currentConfig: Config = withDevice(ConfigSchema.parse({}), currentDevice)
+
+/** config.userAgent / config.device 始终与当前 device 一致，避免两处状态漂移 */
+function withDevice(config: Config, device: DeviceProfile): Config {
+  return { ...config, device, userAgent: userAgentOf(device) }
+}
 
 export function getConfig(): Config {
   return currentConfig
 }
 
 export function setConfig(config: Partial<Config>): Config {
-  currentConfig = ConfigSchema.parse({ ...currentConfig, ...config })
+  const merged = ConfigSchema.parse({ ...currentConfig, ...config })
+
+  if (config.device) {
+    currentDevice = DeviceProfileSchema.parse(config.device)
+  } else if (config.userAgent) {
+    currentDevice = deviceFromUserAgent(config.userAgent)
+  }
+
+  currentConfig = withDevice(merged, currentDevice)
   return currentConfig
 }
 
+export function getDevice(): DeviceProfile {
+  return currentDevice
+}
+
 export function getUserAgent(): string {
-  return currentConfig.userAgent
+  return userAgentOf(currentDevice)
 }
 
 export function getReferer(): string {
@@ -111,3 +144,4 @@ export function getWebidConfig() {
 }
 
 export { DEFAULT_USER_AGENT }
+export type { DeviceProfile }

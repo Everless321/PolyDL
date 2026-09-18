@@ -6,7 +6,7 @@
 import vm from 'node:vm'
 import crypto from 'node:crypto'
 import { WEBCAST_SIGNATURE_JS } from '../algorithm/webcast-signature-source.js'
-import { getConfig } from '../config/index.js'
+import { getUserAgent } from '../config/index.js'
 
 type SignFn = (xMsStub: string) => Record<string, string>
 
@@ -46,7 +46,7 @@ export function getWebcastSignature(
   userUniqueId: string,
   userAgent?: string
 ): string {
-  const ua = userAgent || getConfig().userAgent
+  const ua = userAgent || getUserAgent()
   // 固定顺序的逗号串，与 f2 一致，任何字段/顺序变化都会导致签名失效
   const raw =
     `live_id=1,aid=6383,version_code=180800,webcast_sdk_version=1.0.14-beta.0,` +

@@ -1,5 +1,12 @@
 import { post } from '../client/http.js'
-import { getMsTokenConfig, getTtwidConfig, getWebidConfig, getUserAgent } from '../config/index.js'
+import {
+  getMsTokenConfig,
+  getTtwidConfig,
+  getWebidConfig,
+  getUserAgent,
+  getDevice,
+} from '../config/index.js'
+import { clientHintsOf } from '../device/profile.js'
 import { APIResponseError } from '../errors/index.js'
 import { genRandomStr, getTimestamp } from './common.js'
 
@@ -20,6 +27,7 @@ export async function genRealMsToken(): Promise<string> {
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
       'User-Agent': userAgent,
+      ...clientHintsOf(getDevice()),
     },
   })
 
@@ -45,6 +53,7 @@ export async function genTtwid(): Promise<string> {
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
       'User-Agent': userAgent,
+      ...clientHintsOf(getDevice()),
     },
   })
 
@@ -64,7 +73,8 @@ export async function genWebid(): Promise<string> {
     app_id: config.body.app_id,
     referer: config.body.referer,
     url: config.body.url,
-    user_agent: config.body.user_agent,
+    // 始终用当前 device 的 UA，保证注册 webid 与后续请求同源
+    user_agent: userAgent,
     user_unique_id: '',
   })
 
@@ -72,6 +82,7 @@ export async function genWebid(): Promise<string> {
     headers: {
       'Content-Type': 'application/json; charset=UTF-8',
       'User-Agent': userAgent,
+      ...clientHintsOf(getDevice()),
       Referer: 'https://www.douyin.com/',
     },
   })

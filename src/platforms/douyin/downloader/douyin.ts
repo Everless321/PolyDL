@@ -10,7 +10,8 @@ import got from 'got'
 import pLimit from 'p-limit'
 
 import { formatFileName, ensureDir, json2Lrc } from '../utils/file.js'
-import { getConfig } from '../config/index.js'
+import { getConfig, getDevice } from '../config/index.js'
+import { clientHintsOf, userAgentOf } from '../device/profile.js'
 import type {
   DownloadConfig,
   AwemeData,
@@ -19,6 +20,15 @@ import type {
   DownloadResult,
   ProgressCallback,
 } from './types.js'
+
+/** 按扩展名给下载请求补 Sec-Fetch-Dest，与页面里的资源请求形态一致 */
+function secFetchDestOf(extension: string): string {
+  const ext = extension.toLowerCase()
+  if (['.mp4', '.flv', '.m3u8'].includes(ext)) return 'video'
+  if (['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext)) return 'image'
+  if (['.mp3', '.m4a'].includes(ext)) return 'audio'
+  return 'empty'
+}
 
 export class DouyinDownloader {
   private config: DownloadConfig
@@ -402,12 +412,18 @@ export class DouyinDownloader {
         fs.unlinkSync(filePath)
       }
 
-      const globalConfig = getConfig()
+      const device = this.config.device ?? getDevice()
 
       const reqHeaders = {
-        'User-Agent': globalConfig.userAgent,
-        Referer: globalConfig.referer,
-        Cookie: this.config.cookie,
+        'User-Agent': userAgentOf(device),
+        Referer: getConfig().referer,
+        Cookie: this.config.cookie ?? '',
+        Accept: '*/*',
+        'Accept-Language': `${device.language},zh;q=0.9`,
+        ...clientHintsOf(device),
+        'Sec-Fetch-Dest': secFetchDestOf(extension),
+        'Sec-Fetch-Mode': 'no-cors',
+        'Sec-Fetch-Site': 'cross-site',
       }
 
       // HEAD 预检拿 Content-Length（兜 chunked 编码 / 部分 CDN 响应头缺失场景）

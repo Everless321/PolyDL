@@ -4,6 +4,7 @@ import * as path from 'path'
 import { Command } from 'commander'
 import consola from 'consola'
 import { setConfig } from '../platforms/douyin/config/index.js'
+import { createDeviceProfile, type DeviceOS } from '../platforms/douyin/device/index.js'
 import { getAwemeId, getSecUserId, fetchFromSharePage } from '../platforms/douyin/utils/fetcher.js'
 import { DouyinHandler } from '../platforms/douyin/handler/index.js'
 import { DouyinDownloader } from '../platforms/douyin/downloader/index.js'
@@ -12,7 +13,24 @@ import type { AwemeData } from '../platforms/douyin/downloader/types.js'
 
 const program = new Command()
 
-program.name('pdl').description('多平台短视频下载器（抖音 / 快手 ...）').version('0.4.0')
+program.name('pdl').description('多平台短视频下载器（抖音 / 快手 ...）').version('0.5.0')
+
+interface DeviceOptions {
+  deviceOs?: string
+  deviceSeed?: string
+}
+
+/** 把 --device-os / --device-seed 转成 DeviceProfile；都没传则沿用默认（按本机平台随机） */
+function resolveDevice(options: DeviceOptions) {
+  if (!options.deviceOs && !options.deviceSeed) return undefined
+  if (options.deviceOs && options.deviceOs !== 'mac' && options.deviceOs !== 'windows') {
+    throw new Error(`--device-os 只支持 mac 或 windows，收到: ${options.deviceOs}`)
+  }
+  return createDeviceProfile({
+    os: options.deviceOs as DeviceOS | undefined,
+    seed: options.deviceSeed,
+  })
+}
 
 program
   .command('download <url>')
@@ -23,15 +41,24 @@ program
   .option('--cover', '下载封面')
   .option('--music', '下载音乐')
   .option('--desc', '下载文案')
+  .option('--device-os <os>', '设备指纹平台: mac | windows（默认跟随本机）')
+  .option('--device-seed <seed>', '设备指纹随机种子，同一 seed 复现同一台设备')
   .action(
     async (
       url: string,
-      options: { output: string; cookie?: string; cover?: boolean; music?: boolean; desc?: boolean }
+      options: {
+        output: string
+        cookie?: string
+        cover?: boolean
+        music?: boolean
+        desc?: boolean
+      } & DeviceOptions
     ) => {
       try {
         setConfig({
           downloadPath: options.output,
           cookie: options.cookie || '',
+          device: resolveDevice(options),
         })
 
         consola.start('解析链接...')
@@ -133,6 +160,8 @@ program
   .option('--cover', '下载封面')
   .option('--music', '下载音乐')
   .option('--desc', '下载文案')
+  .option('--device-os <os>', '设备指纹平台: mac | windows（默认跟随本机）')
+  .option('--device-seed <seed>', '设备指纹随机种子，同一 seed 复现同一台设备')
   .action(
     async (
       url: string,
@@ -143,7 +172,7 @@ program
         cover?: boolean
         music?: boolean
         desc?: boolean
-      }
+      } & DeviceOptions
     ) => {
       try {
         if (!options.cookie) {
@@ -154,6 +183,7 @@ program
         setConfig({
           downloadPath: options.output,
           cookie: options.cookie,
+          device: resolveDevice(options),
         })
 
         const maxCount = parseInt(options.number) || 0

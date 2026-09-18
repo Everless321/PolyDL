@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import { getConfig } from '../config/index.js'
+import { getConfig, getUserAgent } from '../config/index.js'
 
 const BASE_URL = 'https://www.douyin.com'
 
@@ -14,7 +14,7 @@ export function getClient(): AxiosInstance {
     baseURL: BASE_URL,
     timeout: config.timeout,
     headers: {
-      'User-Agent': config.userAgent,
+      'User-Agent': getUserAgent(),
       Cookie: config.cookie,
       Referer: 'https://www.douyin.com/',
     },

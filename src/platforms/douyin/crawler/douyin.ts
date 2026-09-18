@@ -4,7 +4,8 @@
  */
 
 import { get, post, HttpResponse } from '../client/http.js'
-import { getConfig, getEncryption } from '../config/index.js'
+import { getDevice, getEncryption } from '../config/index.js'
+import { clientHintsOf, userAgentOf, type DeviceProfile } from '../device/profile.js'
 import { xbogusModel2Endpoint, abogusModel2Endpoint } from '../utils/sign.js'
 import { ENDPOINTS } from '../api/endpoints.js'
 import { fetchRealMsToken, generateFakeMsToken } from '../algorithm/index.js'
@@ -47,20 +48,39 @@ export interface DouyinCrawlerConfig {
     http?: string
     https?: string
   }
+  /** 按实例覆盖全局 device（多账号场景一账号一指纹）；不传则跟随全局配置 */
+  device?: DeviceProfile
 }
 
 export class DouyinCrawler {
   private headers: Record<string, string>
-  private userAgent: string
+  private readonly device: DeviceProfile | null
   private msToken: string | null = null
   private msTokenPromise: Promise<string> | null = null
 
   constructor(config: DouyinCrawlerConfig) {
-    const globalConfig = getConfig()
-    this.userAgent = globalConfig.userAgent
+    this.device = config.device ?? null
     this.headers = {
       Cookie: config.cookie,
       ...config.headers,
+    }
+  }
+
+  /** 实例指定了 device 就用实例的，否则读当前全局配置（构造后 setConfig 也生效） */
+  private get profile(): DeviceProfile {
+    return this.device ?? getDevice()
+  }
+
+  /**
+   * 实例级 device 时要把 UA / Client Hints 一起带上，
+   * 否则签名里的 UA 与请求头 UA 不一致。
+   */
+  private withDeviceHeaders(headers: Record<string, string>): Record<string, string> {
+    if (!this.device) return headers
+    return {
+      'User-Agent': userAgentOf(this.device),
+      ...clientHintsOf(this.device),
+      ...headers,
     }
   }
 
@@ -95,11 +115,20 @@ export class DouyinCrawler {
     const msToken = await this.ensureMsToken()
     const paramsWithMsToken = { ...params, msToken }
 
+    const profile = this.profile
+    const userAgent = userAgentOf(profile)
+
     const encryption = getEncryption()
     if (encryption === 'xb') {
-      return xbogusModel2Endpoint(this.userAgent, baseEndpoint, paramsWithMsToken)
+      return xbogusModel2Endpoint(userAgent, baseEndpoint, paramsWithMsToken)
     }
-    return abogusModel2Endpoint(this.userAgent, baseEndpoint, paramsWithMsToken, body)
+    return abogusModel2Endpoint(
+      userAgent,
+      baseEndpoint,
+      paramsWithMsToken,
+      body,
+      profile.windowFingerprint
+    )
   }
 
   private async fetchGetJson<T = unknown>(
@@ -111,7 +140,7 @@ export class DouyinCrawler {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const response = await get<T>(endpoint, { headers })
+        const response = await get<T>(endpoint, { headers: this.withDeviceHeaders(headers) })
 
         // 检查响应是否为空或无效
         if (response.data === null || response.data === undefined) {
@@ -141,7 +170,7 @@ export class DouyinCrawler {
     endpoint: string,
     body?: string | Record<string, unknown>
   ): Promise<HttpResponse<T>> {
-    return post<T>(endpoint, body, { headers: this.headers })
+    return post<T>(endpoint, body, { headers: this.withDeviceHeaders(this.headers) })
   }
 
   /**

@@ -2,6 +2,8 @@
  * Handler types and interfaces
  */
 
+import type { DeviceProfile } from '../device/profile.js'
+
 export interface HandlerConfig {
   cookie?: string
   headers?: Record<string, string>
@@ -19,6 +21,8 @@ export interface HandlerConfig {
   pageInterval?: number
   url?: string
   folderize?: boolean
+  /** 按实例覆盖全局 device（多账号场景一账号一指纹），透传给内部 DouyinCrawler */
+  device?: DeviceProfile
 }
 
 export interface PaginationOptions {

@@ -2,6 +2,8 @@
  * 下载器类型定义
  */
 
+import type { DeviceProfile } from '../device/profile.js'
+
 export interface DownloadConfig {
   cookie?: string
   downloadPath?: string
@@ -16,6 +18,8 @@ export interface DownloadConfig {
   cover?: boolean
   desc?: boolean
   lyric?: boolean
+  /** 按实例覆盖全局 device；不传则跟随全局配置 */
+  device?: DeviceProfile
 }
 
 export interface DownloadTask {
