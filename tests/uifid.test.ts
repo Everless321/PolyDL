@@ -59,3 +59,30 @@ describe('uifid（ArgusSecurityPlugin 要求的设备参数）', () => {
     expect((await sign(crawler)).get('uifid')).toBe('via_handler')
   })
 })
+
+describe('verifyFp / fp（与 s_v_web_id 同源）', () => {
+  it('Cookie 有 s_v_web_id 时，verifyFp 与 fp 都取它', async () => {
+    const query = await sign(new DouyinCrawler({ cookie: 'sessionid=s; s_v_web_id=verify_abc; UIFID=u' }))
+    expect(query.get('verifyFp')).toBe('verify_abc')
+    expect(query.get('fp')).toBe('verify_abc')
+  })
+
+  it('Cookie 没有 s_v_web_id 时两者都不带', async () => {
+    const query = await sign(new DouyinCrawler({ cookie: 'sessionid=s; UIFID=u' }))
+    expect(query.has('verifyFp')).toBe(false)
+    expect(query.has('fp')).toBe(false)
+  })
+
+  it('调用方参数里已有 verifyFp（如直播接口传空串）时不覆盖', async () => {
+    const crawler = new DouyinCrawler({ cookie: 's_v_web_id=verify_abc' })
+    const internal = crawler as unknown as {
+      msToken: string
+      model2Endpoint: (base: string, params: Record<string, unknown>) => Promise<string>
+    }
+    internal.msToken = 'TEST_MS_TOKEN'
+    const url = await internal.model2Endpoint(ENDPOINT, { verifyFp: '', count: 1 })
+    const query = new URL(url).searchParams
+    expect(query.get('verifyFp')).toBe('')
+    expect(query.has('fp')).toBe(false)
+  })
+})

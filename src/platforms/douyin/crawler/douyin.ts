@@ -115,6 +115,15 @@ export class DouyinCrawler {
     this.uifid = uifid
   }
 
+  /**
+   * Cookie 里的 s_v_web_id。真实页面的 verifyFp / fp 就是它；
+   * detail 等接口的 Argus 校验要求 uifid 与 verifyFp 成套且同源，自己生成的 verifyFp 会被判
+   * 「Signature Not Found」。
+   */
+  private get cookieVerifyFp(): string | null {
+    return this.headers.Cookie?.match(/(?:^|;\s*)s_v_web_id=([^;]+)/)?.[1] ?? null
+  }
+
   private get currentUifid(): string | null {
     return this.uifid ?? uifidFromCookie(this.headers.Cookie ?? '')
   }
@@ -161,9 +170,16 @@ export class DouyinCrawler {
     body: string = ''
   ): Promise<string> {
     const msToken = await this.ensureMsToken()
-    // uifid 必须在签名前加入，a_bogus 会把它一起算进去
+    // uifid / verifyFp / fp 必须在签名前加入，a_bogus 会把它们一起算进去；
+    // 调用方已带 verifyFp（如直播接口传空串）时不动
     const uifid = this.currentUifid
-    const paramsWithMsToken = { ...params, ...(uifid ? { uifid } : {}), msToken }
+    const verifyFp = 'verifyFp' in params ? null : this.cookieVerifyFp
+    const paramsWithMsToken = {
+      ...params,
+      ...(uifid ? { uifid } : {}),
+      ...(verifyFp ? { verifyFp, fp: verifyFp } : {}),
+      msToken,
+    }
 
     const profile = this.profile
     const userAgent = userAgentOf(profile)
