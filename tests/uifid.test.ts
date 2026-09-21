@@ -35,8 +35,13 @@ describe('uifid（ArgusSecurityPlugin 要求的设备参数）', () => {
     expect(query.get('uifid')).toBe('explicit')
   })
 
-  it('既没传也不在 Cookie 里时不带 uifid，不能退而用 UIFID_TEMP', async () => {
+  it('Cookie 里没有 UIFID 时退而用 UIFID_TEMP（真实浏览器就是这么取的）', async () => {
     const query = await sign(new DouyinCrawler({ cookie: 'sessionid=s; UIFID_TEMP=tmp' }))
+    expect(query.get('uifid')).toBe('tmp')
+  })
+
+  it('UIFID 与 UIFID_TEMP 都没有时不带 uifid', async () => {
+    const query = await sign(new DouyinCrawler({ cookie: 'sessionid=s' }))
     expect(query.has('uifid')).toBe(false)
   })
 

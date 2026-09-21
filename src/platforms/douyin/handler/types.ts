@@ -23,7 +23,7 @@ export interface HandlerConfig {
   folderize?: boolean
   /** 按实例覆盖全局 device（多账号场景一账号一指纹），透传给内部 DouyinCrawler */
   device?: DeviceProfile
-  /** 设备参数 uifid，透传给内部 DouyinCrawler；不传则取 Cookie 里的 UIFID */
+  /** 设备参数 uifid，透传给内部 DouyinCrawler；不传则取 Cookie 里的 UIFID / UIFID_TEMP */
   uifid?: string
 }
 

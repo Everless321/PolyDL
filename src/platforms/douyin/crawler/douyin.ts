@@ -52,15 +52,24 @@ export interface DouyinCrawlerConfig {
   device?: DeviceProfile
   /**
    * 设备参数 uifid。被加强管控的会话，接口会被 ArgusSecurityPlugin 以
-   * 「Uifid Not Found」拦截，真实网页请求都带它。不传则取 Cookie 里的 UIFID，
+   * 「Uifid Not Found」拦截，真实网页请求都带它。不传则取 Cookie 里的 UIFID（没有则 UIFID_TEMP），
    * 都没有就不带。
    */
   uifid?: string
 }
 
-/** Cookie 里的 UIFID（不含 UIFID_TEMP） */
+/**
+ * 抖音边缘网关 ArgusSecurityPlugin 要求的请求头。网关目前只检查头在不在、不校验取值：
+ * 缺了它 aweme/post、aweme/detail 等接口直接 403「Uifid Not Found」，
+ * 只补 uifid 不补它则是「Signature Not Found」（易误判成 a_bogus 问题）。
+ * 将来若开始真校验取值，只能改为在真实页面里发请求，让页面自带的 SDK 补齐。
+ */
+const ARGUS_HEADER_VALUE = '1'
+
+/** Cookie 里的 UIFID，没有则用 UIFID_TEMP——真实浏览器取 uifid 就是这个顺序 */
 function uifidFromCookie(cookie: string): string | null {
-  const match = cookie.match(/(?:^|;\s*)UIFID=([^;]+)/)
+  const match =
+    cookie.match(/(?:^|;\s*)UIFID=([^;]+)/) ?? cookie.match(/(?:^|;\s*)UIFID_TEMP=([^;]+)/)
   return match ? match[1] : null
 }
 
@@ -108,6 +117,19 @@ export class DouyinCrawler {
 
   private get currentUifid(): string | null {
     return this.uifid ?? uifidFromCookie(this.headers.Cookie ?? '')
+  }
+
+  /**
+   * 补上 ArgusSecurityPlugin 要求的 x-tt-argus 与 uifid 头。
+   * 调用方显式传的同名头优先；没有 uifid 时不发这个头，免得被当成「有但为空」。
+   */
+  private withArgusHeaders(headers: Record<string, string>): Record<string, string> {
+    const uifid = this.currentUifid
+    return {
+      'x-tt-argus': ARGUS_HEADER_VALUE,
+      ...(uifid ? { uifid } : {}),
+      ...headers,
+    }
   }
 
   private async ensureMsToken(): Promise<string> {
@@ -168,7 +190,9 @@ export class DouyinCrawler {
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const response = await get<T>(endpoint, { headers: this.withDeviceHeaders(headers) })
+        const response = await get<T>(endpoint, {
+          headers: this.withArgusHeaders(this.withDeviceHeaders(headers)),
+        })
 
         // 检查响应是否为空或无效
         if (response.data === null || response.data === undefined) {
@@ -198,7 +222,9 @@ export class DouyinCrawler {
     endpoint: string,
     body?: string | Record<string, unknown>
   ): Promise<HttpResponse<T>> {
-    return post<T>(endpoint, body, { headers: this.withDeviceHeaders(this.headers) })
+    return post<T>(endpoint, body, {
+      headers: this.withArgusHeaders(this.withDeviceHeaders(this.headers)),
+    })
   }
 
   /**
