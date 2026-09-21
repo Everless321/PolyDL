@@ -61,6 +61,7 @@ export class DouyinHandler {
       headers: config.headers,
       proxies: config.proxies,
       device: config.device,
+      uifid: config.uifid,
     })
   }
 

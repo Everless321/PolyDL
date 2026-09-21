@@ -50,6 +50,18 @@ export interface DouyinCrawlerConfig {
   }
   /** 按实例覆盖全局 device（多账号场景一账号一指纹）；不传则跟随全局配置 */
   device?: DeviceProfile
+  /**
+   * 设备参数 uifid。被加强管控的会话，接口会被 ArgusSecurityPlugin 以
+   * 「Uifid Not Found」拦截，真实网页请求都带它。不传则取 Cookie 里的 UIFID，
+   * 都没有就不带。
+   */
+  uifid?: string
+}
+
+/** Cookie 里的 UIFID（不含 UIFID_TEMP） */
+function uifidFromCookie(cookie: string): string | null {
+  const match = cookie.match(/(?:^|;\s*)UIFID=([^;]+)/)
+  return match ? match[1] : null
 }
 
 export class DouyinCrawler {
@@ -57,9 +69,11 @@ export class DouyinCrawler {
   private readonly device: DeviceProfile | null
   private msToken: string | null = null
   private msTokenPromise: Promise<string> | null = null
+  private uifid: string | null
 
   constructor(config: DouyinCrawlerConfig) {
     this.device = config.device ?? null
+    this.uifid = config.uifid ?? null
     this.headers = {
       Cookie: config.cookie,
       ...config.headers,
@@ -82,6 +96,18 @@ export class DouyinCrawler {
       ...clientHintsOf(this.device),
       ...headers,
     }
+  }
+
+  /**
+   * 更新 uifid，之后的请求生效（例如从真实页面请求里采到了更准的值）。
+   * 传 null 恢复为读 Cookie 里的 UIFID。
+   */
+  setUifid(uifid: string | null): void {
+    this.uifid = uifid
+  }
+
+  private get currentUifid(): string | null {
+    return this.uifid ?? uifidFromCookie(this.headers.Cookie ?? '')
   }
 
   private async ensureMsToken(): Promise<string> {
@@ -113,7 +139,9 @@ export class DouyinCrawler {
     body: string = ''
   ): Promise<string> {
     const msToken = await this.ensureMsToken()
-    const paramsWithMsToken = { ...params, msToken }
+    // uifid 必须在签名前加入，a_bogus 会把它一起算进去
+    const uifid = this.currentUifid
+    const paramsWithMsToken = { ...params, ...(uifid ? { uifid } : {}), msToken }
 
     const profile = this.profile
     const userAgent = userAgentOf(profile)
