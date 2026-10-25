@@ -16,6 +16,10 @@ export interface SignRequest {
   path: string
   /** POST 时的原始 body 字符串（与实际发送一致）；GET 省略 */
   body?: string
+  /** 合并进签名的 query（不含 __NS_hxfalcon / caver） */
+  query?: Record<string, unknown>
+  /** 决定 body 归入 form 还是 requestBody；省略时按 application/json */
+  contentType?: string
 }
 
 /** 签名器：产出 __NS_hxfalcon 的值 */
