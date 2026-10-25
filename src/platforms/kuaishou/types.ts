@@ -7,8 +7,13 @@ import type { KuaishouSigner } from './rest.js'
 export interface KuaishouConfig {
   cookie?: string
   headers?: Record<string, string>
-  /** 注入签名器后，handler 可走签名 REST 接口（更稳，需登录 Cookie）；不传则用 graphql */
+  /**
+   * 签名器。不传时 handler 用 LocalSigner 走签名 REST。
+   * 仍可传入 RemoteSigner。
+   */
   signer?: KuaishouSigner
+  /** 显式 kww。不传则从 cookie 的 kwfv1 取值 */
+  kww?: string
 }
 
 /** REST /rest/v/profile/feed 返回（带签名通道，字段比 graphql 更全） */
