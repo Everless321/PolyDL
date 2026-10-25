@@ -1,100 +1,136 @@
 # 快手（Kuaishou）接入设计
 
-> 状态：平台骨架 + graphql 路径 + 签名 REST 路径（经远程签名服务）已实现并实测跑通。
-> 代码：`src/platforms/kuaishou/`。本文档为设计与运维说明，敏感逆向细节不在此（也不入公开仓库）。
+> 状态：www 数据接口、本地 `__NS_hxfalcon` / `__NS_sig3`、作品下载与 CSV/JSON 导出、直播弹幕，以及 CLI 分发已经接上。
+> 代码：`src/platforms/kuaishou/`。签名与 Python 参考实现的对照向量在 `tests/fixtures/kuaishou/sign-vectors.json`。
 
 ## 1. 背景
 
-PolyDL 多平台架构下，快手作为继抖音之后的第二个平台接入。与抖音（f2 对标、ABogus/XBogus 纯 TS 移植）不同，快手的反爬签名无法在库内复现，需采用集中式浏览器签名服务。
+PolyDL 多平台架构下，快手是继抖音之后的第二个平台。抖音签名来自 [f2](https://github.com/Johnserf-Seed/f2) 的纯 TypeScript 移植。快手这边对应的上游是 [KuaiShou-Spider](https://github.com/cv-cat/KuaiShou-Spider)：`__NS_hxfalcon` 和 `__NS_sig3` 已在该项目里纯算实现，本仓库按同一算法移植，并用向量做了逐字节对照（`tests/kuaishou-sign.test.ts`）。
 
-## 2. 快手 web 的两套数据接口
+因此不再依赖常驻浏览器。`RemoteSigner` 只作为可选注入保留。
+
+## 2. 快手 web 的数据接口
 
 | 通道 | 端点 | 签名 | 登录 | 库内实现 |
 |------|------|------|------|----------|
-| GraphQL | `/graphql` | 不需要 | 需要登录态 | `KuaishouHandler`（默认路径，零依赖）|
-| 签名 REST | `/rest/v/*` | 需 `__NS_hxfalcon` | 需要登录态 | `fetchUserPostVideosRest`（经签名服务）|
+| GraphQL | `/graphql` | 不需要 | 需要登录态 | 资料、评论，以及 REST 失败时的作品列表回退 |
+| 签名 REST | `/rest/v/*` | 本地 `__NS_hxfalcon` | 需要登录态 | `KuaishouWebApi` / `KuaishouRestClient` |
+| 直播站 | `live.kuaishou.com` | 本地 `__NS_hxfalcon`（直播 SDK 版本） | 建议直播站 Cookie | `KuaishouLiveClient`、`KuaishouLiveDanmaku` |
 
-关键 operation / 端点：
+`KuaishouWebApi` 覆盖的能力：
 
-- 资料：graphql `visionProfile` ／ REST `/rest/v/profile/get`
-- 用户作品列表：graphql `visionProfilePhotoList` ／ REST `/rest/v/profile/feed`（pcursor 翻页到 `no_more`）
-- 单作品：graphql `visionVideoDetail`（含 HEVC/多码率）
-- 其它签名 REST：`/rest/v/search/{user,feed}`、`/rest/v/feed/{hot,liked}`、`/rest/v/collect/list`、`/rest/v/profile/{user/v2,private/list}`
+- 推荐流：`getFeedHot` / `iterFeedHot`
+- 作品详情：`getVideoDetail` / `getWorkInfo`（GraphQL `visionVideoDetail`，`page=detail`）
+- 评论：`commentListQuery`（`iterCommentsGql`）以及 REST 评论
+- 当前用户资料与主页作品：`getProfile`、`getProfileFeed` / `iterProfileFeed`
+- 搜索作品 / 用户：`searchFeed`、`searchUser`
+- 关系、喜欢、收藏、私密：`getRelation`、`getLikedList`、`getCollectList`、`getPrivateList`
+- 直播回放：`getPlaybackList`（不签名）
 
-> **两条路都需要有效登录 Cookie**（含 `kuaishou.server.web*_st`）。登录态失效时：REST 返回 `result:109`、graphql 返回 `No Login`。
-> 作品总数取 `ownerCount.photo_public`（`photo` 字段常为 null）。
+`KuaishouHandler` 在这些接口之上返回 `normalizeWork` 之后的 `KuaishouWork`：`fetchWork`、`fetchUserWorks`、`searchWorks`、`fetchFeedHot`、`fetchComments`、`fetchUserProfile`。
 
-## 3. 签名 `__NS_hxfalcon` 的本质与结论
+作品总数仍取 `visionProfile.userProfile.ownerCount.photo_public`（`photo` 字段经常是 null）。
 
-- 由快手前端的 falcon 安全引擎产出，是 **fiber 式 JSVMP（自定义字节码虚拟机）**，并重度依赖真实浏览器环境（canvas/screen/navigator 等指纹）。
-- 经实测，三条移植路线中两条不可行：
-  1. **纯 TS 重写**：JSVMP，工作量与脆性都不可接受。✗
-  2. **库内调用页面签名函数**：vite 生产包闭包封死，无可调用入口。✗
-  3. **Node 补环境跑原版引擎**：引擎是自卫式多 chunk VMP，非自包含、依赖私有运行时与加载器，直接加载失败。✗（成本极高、收益不确定）
-- **可行且已验证**：浏览器执行签名。并且发现一个关键性质——
+> 登录态失效：REST `result=109` 或文案 `No Login` → `KuaishouLoginError`。风控 `result=400002`（GraphQL 则是 `errors` + `data.captcha.url`）→ `KuaishouRiskError`。
 
-### 签名与登录解耦（实测）
+## 3. 签名
 
-`__NS_hxfalcon` 只要被服务端接受即可（**可由匿名浏览器产出**），登录由请求时携带的 Cookie 提供。实测：浏览器（设备 A）签名 + 用户 Cookie（设备 B、含登录态）→ `/rest/v/profile/feed` 返回 `result:1` 与真实作品数据。
+`sign/` 是纯 TypeScript，没有浏览器、没有远程进程：
 
-➡️ 因此**一个共享浏览器即可为所有用户产出签名**，各调用方带自己的登录 Cookie。
+- `__NS_hxfalcon`：`HxFalconSigner` / `generateHxfalcon`。www 用默认 SDK 版本；直播用 `site: 'live'`（`SDK_VERSION_LIVE`），空 body 的键保留。
+- `__NS_sig3`：`Sig3Signer`。查询串和 body 参与签名，产物为 56 个 hex。创作者发布流程没有接到 Handler，算法本身有向量测试。
+- `LocalSigner` 实现 `KuaishouSigner`，`KuaishouRestClient` 在未传入 signer 时使用它。计数器跟实例走，和浏览器里一个引擎跨请求递增的方式一致。
+- `kww` 请求头等于 Cookie 里的 `kwfv1`（`KwwProvider`），不重新计算。
 
-## 4. 架构：方案 C —— 集中式签名服务
-
-```
-┌─────────────┐   POST /sign {method,path,body}   ┌──────────────────────────┐
-│  调用方/库   │ ────────────────────────────────▶ │  dym 签名服务（常驻浏览器）│
-│ RemoteSigner│ ◀──────────────────────────────── │  返回 { hxfalcon }        │
-└─────┬───────┘            { hxfalcon }            └──────────────────────────┘
-      │ 用 hxfalcon 拼 URL + 带【用户登录 Cookie】发 /rest/v/*
-      ▼
-   快手服务端 → result:1 + 数据
-```
-
-- **dym 侧**：常驻一个无头浏览器（已加载快手 JS），对外开 `POST /sign`，全局复用（浏览器是一次性成本）。
-- **库侧**：内置 `RemoteSigner` 指向该服务，**零浏览器依赖**；不传 signer 时退回 graphql 路径。
-
-### `/sign` 服务契约
+`RemoteSigner` 仍可用，契约不变：
 
 ```
 POST <endpoint>
 Headers: Content-Type: application/json[, Authorization: Bearer <token>]
-Body:    { "method": "GET"|"POST", "path": "/rest/v/...", "body"?: "<原始body字符串>" }
-200:     { "hxfalcon": "<__NS_hxfalcon 值>" }
+Body:    { "method": "GET"|"POST", "path": "/rest/v/...", "body"?: "<原始 body>" }
+200:     { "hxfalcon": "<__NS_hxfalcon>" }
 ```
 
-> 运维提醒：匿名浏览器产出的签名可被服务端接受；但若要驱动分页**取数**，浏览器侧需登录态——可用一个共享快手账号的登录浏览器抓取公开主页数据。
+媒体 CDN 直链不签名。签名只出现在列表、资料、搜索和直播握手这类接口上。
+
+## 4. 下载、导出与 CLI
+
+`KuaishouDownloader` 的 `mediaType` 对应 KuaiShou-Spider 的 `save_choice`：
+
+| CLI `--media` | `mediaType` | Python `save_choice` |
+|---------------|-------------|----------------------|
+| `all`（默认） | `all` | `media`（视频和图文都下） |
+| `video` | `video` | `media-video` |
+| `image` | `image` | `media-image` |
+
+`--export csv|json` 对应 `excel` 那一支，只是不引入 xlsx：CSV 带 UTF-8 BOM，列序与 `save_to_xlsx` 相同；JSON 保留 `raw`。`all` 在 CLI 里的含义是「下载 + 可选导出」，由 `--export` 决定要不要写表，而不是一个单独的 `all` 枚举值。
+
+命令行：
+
+- `pdl download <url>`、`pdl user <url>` 调用 `findPlatform`。快手用 `KuaishouHandler` + `KuaishouDownloader`；其他链接保持原来的抖音路径。
+- 快手 Cookie：`-c`，否则环境变量 `KS_COOKIES`（与上游 `.env.example` 相同）。
+- `pdl ks`（别名 `kuaishou`）：`search`、`hot`、`comments`、`live`。
+- `--music`、`--device-os`、`--device-seed` 在快手上警告后忽略。`--media`、`--export` 在抖音上警告后忽略。
+
+`ks live` 使用 `KuaishouLiveClient` + `createLiveSigner()` + `KuaishouLiveDanmaku`，把 `comment` / `gift` / `like` 打到日志。
 
 ## 5. 库使用示例
 
 ```ts
-import { KuaishouHandler, RemoteSigner } from 'polydl'
+import { KuaishouHandler, KuaishouWebApi, KuaishouDownloader } from 'polydl'
 
-// 经 dym 签名服务（推荐，方案 C）
-const signer = new RemoteSigner({ endpoint: 'https://dym.example.com/kuaishou/sign', token: '...' })
-const ks = new KuaishouHandler({ cookie: userLoginCookie, signer })
+const cookie = process.env.KS_COOKIES || ''
+const handler = new KuaishouHandler({ cookie })
+const api = new KuaishouWebApi({ cookie })
 
-for await (const page of ks.fetchUserPostVideosRest('3xus99i7auh2ri2')) {
-  // page.result === 1
-  // page.feeds[].photo: id / caption / duration / likeCount / photoUrl / photoH265Url / manifestH265
+const detail = await api.getVideoDetail('<photoId 或作品链接>')
+for await (const page of handler.fetchUserWorks('<eid 或主页链接>', { maxCounts: 20 })) {
+  await new KuaishouDownloader({ cookie, mediaType: 'video', cover: true }).downloadWorks(page)
 }
-
-// 或：默认 graphql 路径（不传 signer，登录态有效即可）
-const ks2 = new KuaishouHandler({ cookie: userLoginCookie })
-for await (const page of ks2.fetchUserPostVideos('3xus99i7auh2ri2')) { /* ... */ }
 ```
 
-## 6. 注意事项
+直播：
 
-- 安全 Cookie（kwscode/kwssectoken 等）约 6 分钟轮换；登录态失效需更新 Cookie。
-- 媒体文件（`photoUrl`/`photoH265Url`）是 CDN 直链，**下载不走签名**，下载引擎直连即可——签名只在「列表/资料 API」这条低频流上。
-- 签名服务只接 API 签名请求（低频），不接媒体下载（高频走 CDN），两者解耦，不会因下载并发高而压垮签名服务。
+```ts
+import { KuaishouLiveClient, KuaishouLiveDanmaku, createLiveSigner } from 'polydl'
 
-## 7. 现状与待办
+const danmaku = new KuaishouLiveDanmaku({
+  eid: '<eid>',
+  client: new KuaishouLiveClient({ cookie, signer: createLiveSigner() }),
+})
+await danmaku.run({ duration: 60 })
+```
+
+## 6. 刻意没有移植
+
+这些能力留在上游 Python 项目里，本仓库不实现：
+
+- 二维码登录、短信验证码登录
+- 创作者中心发布 / 上传（视频与 1～31 张图集）
+- 滑块验证码求解（只把验证页 URL 放进 `KuaishouRiskError`）
+- gdfp 指纹上报
+- kwf/kws 的 Node 预言机，以及用它引导 `kwfv1`。用户必须自己提供完整网页 Cookie，其中要有 `kwfv1`
+
+`getHistoryList` 对应的端点已 404，与上游一样禁止发包。
+
+## 7. 已知限制
+
+- 风控 `400002` 只会变成 `KuaishouRiskError`，调用方自行决定要不要打开 `captchaUrl`
+- 直播弹幕可能需要对 `live.kuaishou.com` 有效的 Cookie；无 token 或 `result` 表示风控时不会建立 WebSocket
+- 推荐流可能因线上合同变化失败，失败信息来自接口本身，不猜测字段
+- 安全 Cookie（`kwscode` / `kwssectoken`）大约 6 分钟轮换；过期后更新整段 Cookie
+
+## 8. 现状与待办
 
 - [x] 平台骨架 `src/platforms/kuaishou/`，注册进 `registry.ts`
-- [x] graphql 路径（profile / 主页列表 / 单作品）
-- [x] 签名 REST 客户端 + `RemoteSigner` + `fetchUserPostVideosRest`（实测 result:1 真实数据）
-- [x] 单元测试（`rest.test.ts`）、README、本设计文档
-- [ ] dym 侧实现 `/sign` 浏览器签名服务
-- [ ] 快手下载器接线 + CLI 按 `findPlatform(url)` 分发
+- [x] GraphQL：资料、主页列表、单作品、评论
+- [x] 签名 REST 客户端；默认 `LocalSigner`，`RemoteSigner` 可选
+- [x] `__NS_hxfalcon` / `__NS_sig3` 纯 TypeScript 实现，与 `tests/fixtures/kuaishou/sign-vectors.json` 逐条一致
+- [x] `KuaishouWebApi`：推荐流、详情、评论、资料、主页、搜索、关系、喜欢、收藏、私密、回放
+- [x] `normalizeWork`、CSV/JSON 导出、`KuaishouDownloader`
+- [x] 直播只读接口与弹幕（`createLiveSigner` + `KuaishouLiveDanmaku`）
+- [x] CLI：`findPlatform` 分发 `download` / `user`，以及 `ks search|hot|comments|live`
+- [x] 单元测试（签名、作品、REST、API、直播、CLI 分发与 Cookie）
+- [ ] 抖音之外的其它平台仍只有注册位，没有命令行实现
+
+第 6 节列出的登录、发布、验证码和 Cookie 引导不在待办里，不会补进本模块。

@@ -1,70 +1,91 @@
 # 快手平台（kuaishou）
 
-快手 web 有两套数据接口，本模块都支持：
+数据接口、`__NS_hxfalcon` / `__NS_sig3` 和直播弹幕移植自 [KuaiShou-Spider](https://github.com/cv-cat/KuaiShou-Spider)。签名在 `sign/` 里用纯 TypeScript 计算，`LocalSigner` 是默认实现，不需要浏览器或远程签名服务。`RemoteSigner` 仍然可以注入。
 
-| 通道 | 端点 | 签名 | 登录 | 用途 |
-|------|------|------|------|------|
-| GraphQL | `/graphql` | 不需要 | 需要登录态 | 轻量默认（`KuaishouHandler` 默认路径）|
-| 签名 REST | `/rest/v/*` | 需 `__NS_hxfalcon` | 需要登录态 | 网页 App 自身通道，更稳（`fetchUserPostVideosRest`）|
+签名结果与 Python 参考实现逐条对照，向量在 `tests/fixtures/kuaishou/sign-vectors.json`，测试在 `tests/kuaishou-sign.test.ts`。
 
-> **两条路都需要有效登录 Cookie**（含 `kuaishou.server.web*_st`）。签名不是数据门槛，登录才是——`__NS_hxfalcon` 只是让 `/rest/v/*` 请求被服务端接受。
+## 通道
 
-## 签名与登录解耦（已实测验证）
+| 通道      | 端点                | 签名                                      | 登录                |
+| --------- | ------------------- | ----------------------------------------- | ------------------- |
+| GraphQL   | `/graphql`          | 不需要                                    | 需要登录态          |
+| 签名 REST | `/rest/v/*`         | 本地 `__NS_hxfalcon`（`caver=2`）         | 需要登录态          |
+| 直播站    | `live.kuaishou.com` | 本地 `__NS_hxfalcon`，SDK 版本与 www 不同 | 建议带直播站 Cookie |
 
-`__NS_hxfalcon` 由快手前端的 falcon 引擎（fiber-JSVMP）生成，**无法纯 TS 重写**，依赖真实浏览器环境（canvas/screen/navigator 指纹）。
+两条路都要**完整网页 Cookie**，至少包含 `kwfv1` 和 `kuaishou.server.web*_st`。请求头里的 `kww` 直接取 Cookie 中的 `kwfv1`，不会在本地重新生成。
 
-但关键事实：**签名与登录是解耦的**——
-
-- 签名只需被服务端接受，可由**任意（甚至匿名）浏览器**产出；
-- 登录由**请求时携带的 Cookie** 提供。
-
-因此**一个共享的浏览器签名器可服务所有用户**，各自带自己的登录 Cookie。这对服务端（dym）很友好：一个常驻热浏览器签名，登录态随请求注入。
-
-## 库的定位：签名器靠注入，库不内置浏览器
-
-库只定义 `KuaishouSigner` 接口 + 签名 REST 客户端，**不依赖 Playwright/Chromium**：
+## 默认用法
 
 ```ts
-import { KuaishouHandler, type KuaishouSigner } from 'polydl'
+import { KuaishouHandler, KuaishouDownloader, exportWorksToJson } from 'polydl'
 
-// dym 侧实现：常驻无头浏览器，产出 __NS_hxfalcon
-const signer: KuaishouSigner = {
-  async sign({ method, path, body }) {
-    // 在已加载快手 JS 的页面里，让 app 的签名 axios 处理该请求，
-    // 截获其 URL 上的 __NS_hxfalcon 返回。详见 dym 侧实现。
-    return hxfalcon
-  },
-}
+const handler = new KuaishouHandler({ cookie: process.env.KS_COOKIES })
 
-const ks = new KuaishouHandler({ cookie: userLoginCookie, signer })
-for await (const page of ks.fetchUserPostVideosRest('3xxxxxx')) {
-  // page.result===1，page.feeds[].photo 含 photoUrl / manifestH265（视频地址）
+const work = await handler.fetchWork('https://www.kuaishou.com/short-video/<photoId>')
+await new KuaishouDownloader({
+  cookie: process.env.KS_COOKIES,
+  downloadPath: './downloads',
+  mediaType: 'all', // all | video | image
+  cover: true,
+  desc: true,
+}).downloadWork(work)
+
+const works = []
+for await (const page of handler.fetchUserWorks('<eid>', { maxCounts: 20 })) {
+  works.push(...page)
 }
+exportWorksToJson(works, './downloads/kuaishou-works.json')
 ```
 
-不传 `signer` 时，`KuaishouHandler` 退回 graphql 路径（零依赖，登录态有效即可用）。
+`KuaishouHandler` 还提供 `fetchUserProfile`、`searchWorks`、`fetchFeedHot`、`fetchComments`。原始 JSON 用 `KuaishouWebApi`（推荐流、详情、评论、资料、主页列表、搜索作品/用户、关系、喜欢、收藏、私密、回放）。
 
-## 方案 C：dym 跑一个浏览器签名服务，全局复用（推荐）
+作品字段经 `normalizeWork` 收成 `KuaishouWork`。列表导出是 CSV（UTF-8 BOM，列与 Python `save_to_xlsx` 一致）或 JSON，不依赖 xlsx 库。
 
-falcon 引擎在页面里完全闭包封死、在 Node 又是自卫式多 chunk VMP——**无法在库内（纯 Node 或调用页面全局）产签名**。因此采用集中式签名服务：
-
-- **dym 侧**：常驻一个无头浏览器（已加载快手 JS），对外开 `POST /sign`：
-  ```
-  请求: { method, path, body? }
-  响应: { hxfalcon: "<__NS_hxfalcon 值>" }
-  ```
-  浏览器是一次性成本、全局复用；签名与登录解耦（签名用匿名浏览器即可，登录由调用方 Cookie 提供）。
-- **库侧 / 其他用户**：用内置 `RemoteSigner` 指向该服务，零浏览器依赖：
+## 可选的远程签名
 
 ```ts
 import { KuaishouHandler, RemoteSigner } from 'polydl'
 
-const signer = new RemoteSigner({ endpoint: 'https://dym.example.com/kuaishou/sign', token: '...' })
-const ks = new KuaishouHandler({ cookie: userLoginCookie, signer })
-for await (const page of ks.fetchUserPostVideosRest('3xxxxxx')) { /* 真实作品数据 */ }
+const handler = new KuaishouHandler({
+  cookie: userLoginCookie,
+  signer: new RemoteSigner({ endpoint: 'https://example.com/kuaishou/sign', token: '...' }),
+})
 ```
 
-## 注意
+`/sign` 约定不变：`POST { method, path, body? }` → `{ hxfalcon }`。不传 `signer` 时不会访问该服务。
 
-- `kwscode`/`kwssectoken` 等安全 Cookie 约 6 分钟轮换；登录态失效时 REST 返回 `result:109`、graphql 返回 `No Login` —— 需更新 Cookie。
-- 作品总数取 `visionProfile.userProfile.ownerCount.photo_public`（`photo` 字段常为 null）。
+## 直播弹幕
+
+```ts
+import { KuaishouLiveClient, KuaishouLiveDanmaku, createLiveSigner } from 'polydl'
+
+const client = new KuaishouLiveClient({
+  cookie: process.env.KS_COOKIES,
+  signer: createLiveSigner(),
+})
+const danmaku = new KuaishouLiveDanmaku({ eid: '<eid>', client })
+danmaku.on('comment', frame => console.log(frame.payload.content))
+await danmaku.run({ duration: 30 })
+```
+
+`createLiveSigner()` 使用直播站参数（`site: 'live'`，独立计数器）。房间需在播；拿不到 WebSocket token 时，优先检查直播站 Cookie 和风控。
+
+## 命令行
+
+`pdl download` / `pdl user` 会按链接分发到本模块。快手专用命令在 `pdl ks`（别名 `kuaishou`）：`search`、`hot`、`comments`、`live`。Cookie 用 `-c` 或 `KS_COOKIES`。
+
+## 刻意没有移植
+
+- 二维码登录、短信登录
+- 创作者中心的发布 / 上传（`__NS_sig3` 算法本身已移植并通过向量测试，但没有接到发布流程）
+- 滑块验证码求解
+- gdfp 指纹上报
+- 用 kwf/kws 的 Node 预言机引导 Cookie。调用方必须自己提供含 `kwfv1` 的完整网页 Cookie
+
+## 已知限制
+
+- `result=400002`（或 GraphQL 的 captcha URL）抛 `KuaishouRiskError`，只带验证页地址，不解题
+- `result=109` 或文案 `No Login` 抛 `KuaishouLoginError`
+- 直播弹幕依赖房间在播，并且 Cookie 往往要对 `live.kuaishou.com` 有效；风控时 `websocketinfo` 不下发 token
+- 推荐流合同可能随网页改版变化
+- 观看历史接口已 404，`getHistoryList` 直接拒绝，不会发请求
