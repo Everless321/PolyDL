@@ -1,0 +1,11 @@
+{
+  "author": { "id": "3xmanifest", "name": "清单作者" },
+  "photo": {
+    "id": "3xmanifestphoto",
+    "caption": "只有清单",
+    "duration": 1000,
+    "timestamp": 1700000000000,
+    "manifest": "{\"adaptationSet\":[{\"representation\":[{\"url\":\"https://cdn.example/low.mp4\",\"width\":480,\"height\":854,\"maxBitrate\":400,\"qualityType\":\"480p\"},{\"url\":\"https://cdn.example/high.mp4\",\"width\":1080,\"height\":1920,\"maxBitrate\":4500,\"qualityType\":\"1080p\"},{\"url\":\"https://cdn.example/mid.m3u8\",\"backupUrl\":[\"https://cdn.example/mid.mp4\"],\"width\":720,\"height\":1280,\"maxBitrate\":1500}]}]}",
+    "manifestH265": "{\"adaptationSet\":[{\"representation\":[{\"url\":\"https://cdn.example/h265-high.mp4\",\"maxBitrate\":8000,\"width\":1080,\"height\":1920}]}]}"
+  }
+}

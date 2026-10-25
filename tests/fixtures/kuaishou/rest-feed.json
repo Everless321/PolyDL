@@ -1,0 +1,55 @@
+{
+  "type": 1,
+  "status": 1,
+  "author": {
+    "id": "3xauthor",
+    "name": "美食小当家",
+    "following": false,
+    "headerUrl": "https://p1.a.yximgs.com/uhead/author.jpg"
+  },
+  "photo": {
+    "id": "3xphoto123",
+    "caption": "红烧肉教程 太香了",
+    "duration": 15230,
+    "timestamp": 1712345678901,
+    "likeCount": 12345,
+    "realLikeCount": 12000,
+    "viewCount": "1.2万",
+    "shareCount": "3w",
+    "collectCount": "2.5万",
+    "coverUrl": "https://p1.a.yximgs.com/upic/cover.jpg",
+    "photoUrl": "https://v1.kwaicdn.com/ksc1/nowm-h264.mp4",
+    "photoH265Url": "https://v1.kwaicdn.com/ksc1/h265.mp4",
+    "manifest": {
+      "mediaType": "video",
+      "adaptationSet": [
+        {
+          "id": 1,
+          "duration": 15230,
+          "representation": [
+            {
+              "id": 1,
+              "url": "https://v1.kwaicdn.com/ksc1/720.mp4",
+              "width": 720,
+              "height": 1280,
+              "maxBitrate": 1600,
+              "avgBitrate": 1200,
+              "qualityType": "720p",
+              "defaultSelect": true
+            },
+            {
+              "id": 2,
+              "url": "https://v1.kwaicdn.com/ksc1/1080.mp4",
+              "width": 1080,
+              "height": 1920,
+              "maxBitrate": 4200,
+              "qualityType": "1080p"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "comment": { "us_c": 88 },
+  "tags": [{ "type": "1", "name": "美食" }]
+}

@@ -1,0 +1,31 @@
+{
+  "type": 1,
+  "author": {
+    "id": "3xatlasuser",
+    "name": "图文作者",
+    "headerUrl": "https://p3.a.yximgs.com/uhead/atlas.jpg"
+  },
+  "photo": {
+    "id": "3xatlas",
+    "caption": "周末花絮",
+    "timestamp": 1710000000000,
+    "likeCount": "1.2万",
+    "duration": 0,
+    "coverUrl": "https://p3.a.yximgs.com/upic/atlas-cover.jpg",
+    "photoUrl": "https://v1.kwaicdn.com/ksc1/atlas-has-video.mp4",
+    "ext_params": {
+      "atlas": {
+        "music": "https://music.example/a.m4a",
+        "volume": 1,
+        "cdn": ["tx2.a.yximgs.com", "ali2.a.yximgs.com"],
+        "size": [{ "w": 1080, "h": 1440 }],
+        "list": [
+          "/bs2/photo/atlas/a1.jpg",
+          "/bs2/photo/atlas/a2.webp",
+          "https://full.example/a3.png"
+        ]
+      }
+    }
+  },
+  "tags": ["旅行", { "name": "摄影" }]
+}
