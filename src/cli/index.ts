@@ -37,7 +37,7 @@ function readCliVersion(): string {
   } catch {
     // 相对路径在某些打包形态下会失效，退回当前发布版本
   }
-  return '0.5.3'
+  return '0.6.0'
 }
 
 function exitWithError(prefix: string, error: unknown): never {
