@@ -34,7 +34,9 @@ describe('KuaishouRestClient', () => {
     const init = call[1]
     expect(url).toBe('https://www.kuaishou.com/rest/v/profile/feed?__NS_hxfalcon=SIG123&caver=2')
     expect(init.method).toBe('POST')
-    expect(init.headers.Cookie).toContain('kuaishou.server.webday7_st=TOKEN')
+    expect(init.headers.cookie).toContain('kuaishou.server.webday7_st=TOKEN')
+    expect(init.headers['content-type']).toBe('application/json')
+    expect(init.headers.origin).toBe('https://www.kuaishou.com')
     expect(init.body).toBe('{"user_id":"u1","pcursor":"","page":"profile"}')
   })
 

@@ -1,237 +1,57 @@
 /**
- * 快手 GraphQL operation 文本
+ * 快手 GraphQL operation 文本。
  *
- * 快手 web 接口无签名，POST https://www.kuaishou.com/graphql，
- * body = { operationName, query, variables }，仅需有效 Cookie。
+ * 带 GQL_ 前缀的常量逐字来自 KuaiShou-Spider（Chrome 实抓）。服务端按 query
+ * 文本做持久化校验，换行和缩进都不能改。
  *
- * VISION_PROFILE_PHOTO_LIST 已从公开实现取到完整文本，可直接使用。
- * 其余 operation 标注 TODO —— 打开快手网页版对应页面，F12 → Network →
- * 过滤 graphql → 复制对应请求的完整 query 字符串回填即可。
+ * 与本文件旧版的差别（以 Python 为准）：
+ * - VISION_VIDEO_DETAIL 补上 verifiedDetail、authorStatement，以及各层 __typename
+ * - VISION_PROFILE_PHOTO_LIST 补上 photoContent.disableSensitivePhoto、
+ *   author.verifiedDetail、authorStatement，查询变量增加 profile_referer
+ * - VISION_PROFILE 仍是旧文本：Python 没有 visionProfile，登录用户资料走
+ *   visionProfileReduced / userInfoQuery
  */
+export const GQL_SHORT_VIDEO_RECO =
+  'fragment photoContent on PhotoEntity {\n  __typename\n  id\n  duration\n  caption\n  originCaption\n  likeCount\n  viewCount\n  commentCount\n  realLikeCount\n  coverUrl\n  photoUrl\n  photoH265Url\n  manifest\n  manifestH265\n  videoResource\n  coverUrls {\n    url\n    __typename\n  }\n  timestamp\n  expTag\n  animatedCoverUrl\n  distance\n  disableSensitivePhoto\n  videoRatio\n  liked\n  stereoType\n  profileUserTopPhoto\n  musicBlocked\n  riskTagContent\n  riskTagUrl\n}\n\nquery visionShortVideoReco($semKeyword: String, $semCrowd: String, $utmSource: String, $utmMedium: String, $page: String, $photoId: String, $utmCampaign: String) {\n  visionShortVideoReco(semKeyword: $semKeyword, semCrowd: $semCrowd, utmSource: $utmSource, utmMedium: $utmMedium, page: $page, photoId: $photoId, utmCampaign: $utmCampaign) {\n    llsid\n    feeds {\n      type\n      author {\n        id\n        name\n        following\n        headerUrl\n        __typename\n      }\n      photo {\n        ...photoContent\n        __typename\n      }\n      tags {\n        type\n        name\n        __typename\n      }\n      authorStatement {\n        content\n        type\n        riskStyleType\n        __typename\n      }\n      canAddComment\n      __typename\n    }\n    __typename\n  }\n}\n'
+export const GQL_COMMENT_LIST =
+  'query commentListQuery($photoId: String, $pcursor: String) {\n  visionCommentList(photoId: $photoId, pcursor: $pcursor) {\n    commentCount\n    commentCountV2\n    pcursor\n    rootCommentsV2 {\n      commentId\n      authorId\n      authorName\n      content\n      headurl\n      timestamp\n      hasSubComments\n      likedCount\n      liked\n      status\n      __typename\n    }\n    pcursorV2\n    rootComments {\n      commentId\n      authorId\n      authorName\n      content\n      headurl\n      timestamp\n      likedCount\n      realLikedCount\n      liked\n      status\n      authorLiked\n      subCommentCount\n      subCommentsPcursor\n      subComments {\n        commentId\n        authorId\n        authorName\n        content\n        headurl\n        timestamp\n        likedCount\n        realLikedCount\n        liked\n        status\n        authorLiked\n        replyToUserName\n        replyTo\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}\n'
+export const GQL_SUB_COMMENT_LIST =
+  'mutation visionSubCommentList($photoId: String, $rootCommentId: String, $pcursor: String) {\n  visionSubCommentList(photoId: $photoId, rootCommentId: $rootCommentId, pcursor: $pcursor) {\n    pcursor\n    subComments {\n      commentId\n      authorId\n      authorName\n      content\n      headurl\n      timestamp\n      likedCount\n      realLikedCount\n      liked\n      status\n      authorLiked\n      replyToUserName\n      replyTo\n      __typename\n    }\n    pcursorV2\n    subCommentsV2 {\n      commentId\n      authorId\n      authorName\n      content\n      headurl\n      timestamp\n      hasSubComments\n      likedCount\n      liked\n      status\n      replyToUserName\n      replyTo\n      __typename\n    }\n    __typename\n  }\n}\n'
+export const GQL_VIDEO_DETAIL =
+  'query visionVideoDetail($photoId: String, $type: String, $page: String, $webPageArea: String) {\n  visionVideoDetail(photoId: $photoId, type: $type, page: $page, webPageArea: $webPageArea) {\n    status\n    type\n    author {\n      id\n      name\n      following\n      headerUrl\n      livingInfo\n      verifiedDetail\n      __typename\n    }\n    photo {\n      id\n      duration\n      caption\n      likeCount\n      realLikeCount\n      coverUrl\n      photoUrl\n      liked\n      timestamp\n      expTag\n      llsid\n      viewCount\n      videoRatio\n      stereoType\n      musicBlocked\n      riskTagContent\n      riskTagUrl\n      manifest {\n        mediaType\n        businessType\n        version\n        adaptationSet {\n          id\n          duration\n          representation {\n            id\n            defaultSelect\n            backupUrl\n            codecs\n            url\n            height\n            width\n            avgBitrate\n            maxBitrate\n            m3u8Slice\n            qualityType\n            qualityLabel\n            frameRate\n            featureP2sp\n            hidden\n            disableAdaptive\n            __typename\n          }\n          __typename\n        }\n        __typename\n      }\n      manifestH265\n      photoH265Url\n      coronaCropManifest\n      coronaCropManifestH265\n      croppedPhotoH265Url\n      croppedPhotoUrl\n      videoResource\n      __typename\n    }\n    authorStatement {\n      content\n      type\n      riskStyleType\n      __typename\n    }\n    tags {\n      type\n      name\n      __typename\n    }\n    commentLimit {\n      canAddComment\n      __typename\n    }\n    llsid\n    danmakuSwitch\n    __typename\n  }\n}\n'
+export const GQL_BASE_EMOTICONS =
+  'query visionBaseEmoticons {\n  visionBaseEmoticons {\n    iconUrls\n    __typename\n  }\n}\n'
+export const GQL_USER_INFO =
+  'query userInfoQuery {\n  userInfo {\n    id\n    name\n    avatar\n    eid\n    userId\n    __typename\n  }\n}\n'
+export const GQL_FOLLOW_FEED_FRAGMENTS =
+  'fragment photoContent on PhotoEntity {\n  __typename\n  id\n  duration\n  caption\n  originCaption\n  likeCount\n  viewCount\n  commentCount\n  realLikeCount\n  coverUrl\n  photoUrl\n  photoH265Url\n  manifest\n  manifestH265\n  videoResource\n  coverUrls {\n    url\n    __typename\n  }\n  timestamp\n  expTag\n  animatedCoverUrl\n  distance\n  disableSensitivePhoto\n  videoRatio\n  liked\n  stereoType\n  profileUserTopPhoto\n  musicBlocked\n  riskTagContent\n  riskTagUrl\n}\n\nfragment recoPhotoFragment on recoPhotoEntity {\n  __typename\n  id\n  duration\n  caption\n  originCaption\n  likeCount\n  viewCount\n  commentCount\n  realLikeCount\n  coverUrl\n  photoUrl\n  photoH265Url\n  manifest\n  manifestH265\n  videoResource\n  coverUrls {\n    url\n    __typename\n  }\n  timestamp\n  expTag\n  animatedCoverUrl\n  distance\n  videoRatio\n  liked\n  stereoType\n  profileUserTopPhoto\n  musicBlocked\n  riskTagContent\n  riskTagUrl\n}\n\nfragment feedContentWithLiveInfo on Feed {\n  type\n  author {\n    id\n    name\n    headerUrl\n    following\n    livingInfo\n    headerUrls {\n      url\n      __typename\n    }\n    verifiedDetail {\n      description\n      iconType\n      newVerified\n      musicCompany\n      type\n      __typename\n    }\n    __typename\n  }\n  photo {\n    ...photoContent\n    ...recoPhotoFragment\n    __typename\n  }\n  canAddComment\n  llsid\n  status\n  authorStatement {\n    content\n    type\n    riskStyleType\n    __typename\n  }\n  currentPcursor\n  tags {\n    type\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment photoResult on PhotoResult {\n  result\n  llsid\n  expTag\n  serverExpTag\n  pcursor\n  feeds {\n    ...feedContentWithLiveInfo\n    __typename\n  }\n  webPageArea\n  __typename\n}\n\n'
+export const GQL_LIKE_DATA =
+  'fragment photoContent on PhotoEntity {\n  __typename\n  id\n  duration\n  caption\n  originCaption\n  likeCount\n  viewCount\n  commentCount\n  realLikeCount\n  coverUrl\n  photoUrl\n  photoH265Url\n  manifest\n  manifestH265\n  videoResource\n  coverUrls {\n    url\n    __typename\n  }\n  timestamp\n  expTag\n  animatedCoverUrl\n  distance\n  disableSensitivePhoto\n  videoRatio\n  liked\n  stereoType\n  profileUserTopPhoto\n  musicBlocked\n  riskTagContent\n  riskTagUrl\n}\n\nfragment recoPhotoFragment on recoPhotoEntity {\n  __typename\n  id\n  duration\n  caption\n  originCaption\n  likeCount\n  viewCount\n  commentCount\n  realLikeCount\n  coverUrl\n  photoUrl\n  photoH265Url\n  manifest\n  manifestH265\n  videoResource\n  coverUrls {\n    url\n    __typename\n  }\n  timestamp\n  expTag\n  animatedCoverUrl\n  distance\n  videoRatio\n  liked\n  stereoType\n  profileUserTopPhoto\n  musicBlocked\n  riskTagContent\n  riskTagUrl\n}\n\nfragment feedContentWithLiveInfo on Feed {\n  type\n  author {\n    id\n    name\n    headerUrl\n    following\n    livingInfo\n    headerUrls {\n      url\n      __typename\n    }\n    verifiedDetail {\n      description\n      iconType\n      newVerified\n      musicCompany\n      type\n      __typename\n    }\n    __typename\n  }\n  photo {\n    ...photoContent\n    ...recoPhotoFragment\n    __typename\n  }\n  canAddComment\n  llsid\n  status\n  authorStatement {\n    content\n    type\n    riskStyleType\n    __typename\n  }\n  currentPcursor\n  tags {\n    type\n    name\n    __typename\n  }\n  __typename\n}\n\nfragment photoResult on PhotoResult {\n  result\n  llsid\n  expTag\n  serverExpTag\n  pcursor\n  feeds {\n    ...feedContentWithLiveInfo\n    __typename\n  }\n  webPageArea\n  __typename\n}\n\nquery likeDataQuery($pcursor: String, $page: String, $token: String, $st: Long) {\n  likeData(pcursor: $pcursor, page: $page, token: $token, st: $st) {\n    ...photoResult\n    __typename\n  }\n}\n'
+export const GQL_VISION_PROFILE_REDUCED =
+  'query visionProfileReduced($userId: String) {\n  visionProfileReduced(userId: $userId) {\n    result\n    hostName\n    userProfile {\n      profile {\n        gender\n        user_name\n        user_id\n        headurl\n        user_text\n        user_profile_bg_url\n        __typename\n      }\n      isFollowing\n      isUserIsolated\n      livingInfo\n      __typename\n    }\n    __typename\n  }\n}\n'
+export const GQL_PROFILE_PHOTO_LIST =
+  'fragment photoContent on PhotoEntity {\n  __typename\n  id\n  duration\n  caption\n  originCaption\n  likeCount\n  viewCount\n  commentCount\n  realLikeCount\n  coverUrl\n  photoUrl\n  photoH265Url\n  manifest\n  manifestH265\n  videoResource\n  coverUrls {\n    url\n    __typename\n  }\n  timestamp\n  expTag\n  animatedCoverUrl\n  distance\n  disableSensitivePhoto\n  videoRatio\n  liked\n  stereoType\n  profileUserTopPhoto\n  musicBlocked\n  riskTagContent\n  riskTagUrl\n}\n\nfragment recoPhotoFragment on recoPhotoEntity {\n  __typename\n  id\n  duration\n  caption\n  originCaption\n  likeCount\n  viewCount\n  commentCount\n  realLikeCount\n  coverUrl\n  photoUrl\n  photoH265Url\n  manifest\n  manifestH265\n  videoResource\n  coverUrls {\n    url\n    __typename\n  }\n  timestamp\n  expTag\n  animatedCoverUrl\n  distance\n  videoRatio\n  liked\n  stereoType\n  profileUserTopPhoto\n  musicBlocked\n  riskTagContent\n  riskTagUrl\n}\n\nfragment feedContentWithLiveInfo on Feed {\n  type\n  author {\n    id\n    name\n    headerUrl\n    following\n    livingInfo\n    headerUrls {\n      url\n      __typename\n    }\n    verifiedDetail {\n      description\n      iconType\n      newVerified\n      musicCompany\n      type\n      __typename\n    }\n    __typename\n  }\n  photo {\n    ...photoContent\n    ...recoPhotoFragment\n    __typename\n  }\n  canAddComment\n  llsid\n  status\n  authorStatement {\n    content\n    type\n    riskStyleType\n    __typename\n  }\n  currentPcursor\n  tags {\n    type\n    name\n    __typename\n  }\n  __typename\n}\n\nquery visionProfilePhotoList($pcursor: String, $userId: String, $page: String, $webPageArea: String, $profile_referer: String) {\n  visionProfilePhotoList(pcursor: $pcursor, userId: $userId, page: $page, webPageArea: $webPageArea, profile_referer: $profile_referer) {\n    result\n    llsid\n    webPageArea\n    feeds {\n      ...feedContentWithLiveInfo\n      __typename\n    }\n    hostName\n    pcursor\n    __typename\n  }\n}\n'
+export const GQL_VISION_CONFIG =
+  'query visionConfigQuery {\n  visionConfig {\n    coronaTabs {\n      tabId\n      name\n      folded\n      selected\n      __typename\n    }\n    tubeTabs {\n      tabId\n      name\n      folded\n      selected\n      subTabs {\n        subTabId\n        subTabName\n        __typename\n      }\n      __typename\n    }\n    banners {\n      id\n      landingUrl\n      imageUrl\n      checkLogin\n      openInNewTab\n      __typename\n    }\n    movieTagTypes {\n      movieTagType\n      movieTagValues\n      __typename\n    }\n    disabledModules\n    homeModuleOrder\n    __typename\n  }\n}\n'
+export const GQL_KCONF = 'query {\n  kconf(key: $key)\n}\n'
+export const GQL_VISION_LOGIN_CONFIG =
+  'query visionLoginConfig($key: String) {\n  kconf(key: $key)\n}\n'
+export const GQL_CHECK_LOGIN = 'query checkLoginQuery {\n  checkLogin\n}\n'
+export const GQL_VISION_OTT_CONFIG =
+  'query visionOttConfig($key: String) {\n  kconf(key: $key)\n}\n'
+export const VISION_PROFILE =
+  'query visionProfile($userId: String) {\n  visionProfile(userId: $userId) {\n    result\n    hostName\n    userProfile {\n      ownerCount {\n        fan\n        photo\n        follow\n        photo_public\n        __typename\n      }\n      profile {\n        gender\n        user_name\n        user_id\n        headurl\n        user_text\n        user_profile_bg_url\n        __typename\n      }\n      isFollowing\n      livingInfo\n      __typename\n    }\n    __typename\n  }\n}\n'
 
-/**
- * 用户主页作品列表（分页）
- * 注意：feeds[].photo 是联合类型 Photo = PhotoEntity | recoPhotoEntity，
- * 必须用 fragment 在具体类型上取字段，直接 photo{id} 会 400。
- */
-export const VISION_PROFILE_PHOTO_LIST = `fragment photoContent on PhotoEntity {
-  __typename
-  id
-  duration
-  caption
-  originCaption
-  likeCount
-  viewCount
-  commentCount
-  realLikeCount
-  coverUrl
-  photoUrl
-  photoH265Url
-  manifest
-  manifestH265
-  videoResource
-  coverUrls {
-    url
-    __typename
-  }
-  timestamp
-  expTag
-  animatedCoverUrl
-  distance
-  videoRatio
-  liked
-  stereoType
-  profileUserTopPhoto
-  musicBlocked
-  riskTagContent
-  riskTagUrl
-}
-
-fragment recoPhotoFragment on recoPhotoEntity {
-  __typename
-  id
-  duration
-  caption
-  originCaption
-  likeCount
-  viewCount
-  commentCount
-  realLikeCount
-  coverUrl
-  photoUrl
-  photoH265Url
-  manifest
-  manifestH265
-  videoResource
-  coverUrls {
-    url
-    __typename
-  }
-  timestamp
-  expTag
-  animatedCoverUrl
-  distance
-  videoRatio
-  liked
-  stereoType
-  profileUserTopPhoto
-  musicBlocked
-  riskTagContent
-  riskTagUrl
-}
-
-fragment feedContentWithLiveInfo on Feed {
-  type
-  author {
-    id
-    name
-    headerUrl
-    following
-    livingInfo
-    headerUrls {
-      url
-      __typename
-    }
-    __typename
-  }
-  photo {
-    ...photoContent
-    ...recoPhotoFragment
-    __typename
-  }
-  canAddComment
-  llsid
-  status
-  currentPcursor
-  tags {
-    type
-    name
-    __typename
-  }
-  __typename
-}
-
-query visionProfilePhotoList($pcursor: String, $userId: String, $page: String, $webPageArea: String) {
-  visionProfilePhotoList(pcursor: $pcursor, userId: $userId, page: $page, webPageArea: $webPageArea) {
-    result
-    llsid
-    webPageArea
-    feeds {
-      ...feedContentWithLiveInfo
-      __typename
-    }
-    hostName
-    pcursor
-    __typename
-  }
-}
-`
-
-/** 用户资料（昵称/粉丝/作品数/头像） */
-export const VISION_PROFILE = `query visionProfile($userId: String) {
-  visionProfile(userId: $userId) {
-    result
-    hostName
-    userProfile {
-      ownerCount {
-        fan
-        photo
-        follow
-        photo_public
-        __typename
-      }
-      profile {
-        gender
-        user_name
-        user_id
-        headurl
-        user_text
-        user_profile_bg_url
-        __typename
-      }
-      isFollowing
-      livingInfo
-      __typename
-    }
-    __typename
-  }
-}
-`
-
-/** 单作品详情（含 HEVC photoH265Url + 多码率 manifest.adaptationSet） */
-export const VISION_VIDEO_DETAIL = `query visionVideoDetail($photoId: String, $type: String, $page: String, $webPageArea: String) {
-  visionVideoDetail(photoId: $photoId, type: $type, page: $page, webPageArea: $webPageArea) {
-    status
-    type
-    author {
-      id
-      name
-      following
-      headerUrl
-      livingInfo
-    }
-    photo {
-      id
-      duration
-      caption
-      likeCount
-      realLikeCount
-      coverUrl
-      photoUrl
-      liked
-      timestamp
-      expTag
-      llsid
-      viewCount
-      videoRatio
-      stereoType
-      musicBlocked
-      riskTagContent
-      riskTagUrl
-      manifest {
-        mediaType
-        businessType
-        version
-        adaptationSet {
-          id
-          duration
-          representation {
-            id
-            defaultSelect
-            backupUrl
-            codecs
-            url
-            height
-            width
-            avgBitrate
-            maxBitrate
-            m3u8Slice
-            qualityType
-            qualityLabel
-            frameRate
-            featureP2sp
-            hidden
-            disableAdaptive
-          }
-        }
-      }
-      manifestH265
-      photoH265Url
-      coronaCropManifest
-      coronaCropManifestH265
-      croppedPhotoH265Url
-      croppedPhotoUrl
-      videoResource
-    }
-    tags {
-      type
-      name
-    }
-    commentLimit {
-      canAddComment
-    }
-    llsid
-    danmakuSwitch
-  }
-}
-`
+export const VISION_SHORT_VIDEO_RECO = GQL_SHORT_VIDEO_RECO
+export const VISION_VIDEO_DETAIL = GQL_VIDEO_DETAIL
+export const VISION_PROFILE_PHOTO_LIST = GQL_PROFILE_PHOTO_LIST
+export const GQL_COMMENT_LIST_QUERY = GQL_COMMENT_LIST
+export const VISION_SUB_COMMENT_LIST = GQL_SUB_COMMENT_LIST
+export const VISION_BASE_EMOTICONS = GQL_BASE_EMOTICONS
+export const VISION_USER_INFO = GQL_USER_INFO
+export const VISION_LIKE_DATA = GQL_LIKE_DATA
+export const VISION_PROFILE_REDUCED = GQL_VISION_PROFILE_REDUCED
+export const VISION_CONFIG = GQL_VISION_CONFIG
+export const VISION_LOGIN_CONFIG = GQL_VISION_LOGIN_CONFIG
+export const VISION_CHECK_LOGIN = GQL_CHECK_LOGIN
+export const VISION_OTT_CONFIG = GQL_VISION_OTT_CONFIG

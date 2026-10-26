@@ -1,0 +1,87 @@
+{
+  "status": 1,
+  "type": 1,
+  "__typename": "VisionVideoDetail",
+  "author": {
+    "id": "3xgqluser",
+    "name": "旅行博主",
+    "following": false,
+    "headerUrl": "",
+    "headerUrls": [{ "url": "https://p2.a.yximgs.com/uhead/gql.jpg", "__typename": "CdnNode" }]
+  },
+  "photo": {
+    "__typename": "PhotoEntity",
+    "id": "3xgqlphoto",
+    "duration": 8000,
+    "caption": "海边日落",
+    "likeCount": "74万",
+    "realLikeCount": 739999,
+    "coverUrl": "",
+    "coverUrls": [
+      { "url": "https://p2.a.yximgs.com/upic/gql-cover.jpg", "cdn": "p2.a.yximgs.com" }
+    ],
+    "photoUrl": "https://v1.kwaicdn.com/ksc1/gql-h264.mp4",
+    "liked": false,
+    "timestamp": 1700000000000,
+    "viewCount": "3亿",
+    "commentCount": "10万+",
+    "collectCount": "1,234",
+    "photoH265Url": "https://v1.kwaicdn.com/ksc1/gql-h265.mp4",
+    "manifest": {
+      "mediaType": "video",
+      "businessType": "shortVideo",
+      "version": "1.0.0",
+      "adaptationSet": [
+        {
+          "id": 1,
+          "duration": 8000,
+          "representation": [
+            {
+              "id": "1",
+              "url": "https://v1.kwaicdn.com/ksc1/gql-720.mp4",
+              "maxBitrate": 1500,
+              "width": 720,
+              "height": 1280,
+              "qualityType": "720p",
+              "defaultSelect": true,
+              "hidden": false
+            },
+            {
+              "id": "2",
+              "url": "https://v1.kwaicdn.com/ksc1/gql-1080.mp4",
+              "maxBitrate": 4000,
+              "width": 1080,
+              "height": 1920,
+              "qualityType": "1080p",
+              "hidden": false
+            },
+            {
+              "id": "3",
+              "url": "https://v1.kwaicdn.com/ksc1/gql-hidden.mp4",
+              "maxBitrate": 9000,
+              "width": 1440,
+              "height": 2560,
+              "qualityType": "1440p",
+              "hidden": true
+            }
+          ]
+        }
+      ]
+    },
+    "manifestH265": {
+      "adaptationSet": [
+        {
+          "representation": [
+            {
+              "url": "https://v1.kwaicdn.com/ksc1/gql-h265-ladder.mp4",
+              "maxBitrate": 8000,
+              "width": 1080,
+              "height": 1920
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "tags": [{ "type": "topic", "name": "旅行", "__typename": "Tag" }, { "name": "日常" }]
+}

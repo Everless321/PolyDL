@@ -1,0 +1,2641 @@
+{
+  "defaults": {
+    "caver": "2",
+    "sdkVersion": 43468,
+    "sdkVersionLive": 43469,
+    "scriptsLen": 24,
+    "secsStack": "spatchRequest (https://p23-plat.wskwai.com/kos/nlav111422/ks-web/assets/index-bZyTA7JL.js:32:235479)",
+    "projectInfo": {
+      "appKey": "mMovf2dVDF",
+      "debug": false,
+      "sampling": 1
+    }
+  },
+  "jsval": {
+    "numbers": [
+      {
+        "value": 0,
+        "expected": "0"
+      },
+      {
+        "negZero": true,
+        "expected": "0"
+      },
+      {
+        "value": 1,
+        "expected": "1"
+      },
+      {
+        "value": -1,
+        "expected": "-1"
+      },
+      {
+        "value": 1.0,
+        "expected": "1"
+      },
+      {
+        "value": 2.5,
+        "expected": "2.5"
+      },
+      {
+        "value": -0.5,
+        "expected": "-0.5"
+      },
+      {
+        "value": 0.1,
+        "expected": "0.1"
+      },
+      {
+        "value": 1e+21,
+        "expected": "1e+21"
+      },
+      {
+        "value": 1e-06,
+        "expected": "0.000001"
+      },
+      {
+        "value": 1e-07,
+        "expected": "1e-7"
+      },
+      {
+        "value": 1e-08,
+        "expected": "1e-8"
+      },
+      {
+        "value": 1.5e-07,
+        "expected": "1.5e-7"
+      },
+      {
+        "value": 2147483647,
+        "expected": "2147483647"
+      },
+      {
+        "value": 4294967295,
+        "expected": "4294967295"
+      },
+      {
+        "value": 9007199254740991,
+        "expected": "9007199254740991"
+      },
+      {
+        "intString": "9007199254740993",
+        "expected": "9007199254740992"
+      },
+      {
+        "value": 1.2345678901234568e+29,
+        "expected": "1.2345678901234568e+29"
+      },
+      {
+        "value": 123456.789,
+        "expected": "123456.789"
+      },
+      {
+        "value": 1e+300,
+        "expected": "1e+300"
+      },
+      {
+        "value": 5e-324,
+        "expected": "5e-324"
+      },
+      {
+        "value": 100,
+        "expected": "100"
+      },
+      {
+        "value": 20,
+        "expected": "20"
+      },
+      {
+        "value": 0.30000000000000004,
+        "expected": "0.30000000000000004"
+      },
+      {
+        "value": 1e+16,
+        "expected": "10000000000000000"
+      },
+      {
+        "value": 1000000000000000.0,
+        "expected": "1000000000000000"
+      },
+      {
+        "value": 1e+20,
+        "expected": "100000000000000000000"
+      },
+      {
+        "value": 0.0001,
+        "expected": "0.0001"
+      },
+      {
+        "value": 1e-05,
+        "expected": "0.00001"
+      },
+      {
+        "value": 3.141592653589793,
+        "expected": "3.141592653589793"
+      },
+      {
+        "nan": true,
+        "expected": "NaN"
+      },
+      {
+        "inf": 1,
+        "expected": "Infinity"
+      },
+      {
+        "inf": -1,
+        "expected": "-Infinity"
+      }
+    ],
+    "strings": [
+      {
+        "value": null,
+        "expected": "null"
+      },
+      {
+        "value": true,
+        "expected": "true"
+      },
+      {
+        "value": false,
+        "expected": "false"
+      },
+      {
+        "value": "",
+        "expected": ""
+      },
+      {
+        "value": "a",
+        "expected": "a"
+      },
+      {
+        "value": [
+          1,
+          2
+        ],
+        "expected": "1,2"
+      },
+      {
+        "value": [
+          1,
+          null,
+          2
+        ],
+        "expected": "1,,2"
+      },
+      {
+        "value": [
+          [
+            1,
+            2
+          ],
+          3
+        ],
+        "expected": "1,2,3"
+      },
+      {
+        "value": [],
+        "expected": ""
+      },
+      {
+        "value": {},
+        "expected": "[object Object]"
+      },
+      {
+        "value": [
+          {}
+        ],
+        "expected": "[object Object]"
+      },
+      {
+        "value": "中文😀",
+        "expected": "中文😀"
+      }
+    ],
+    "json": [
+      {
+        "value": {
+          "b": 1,
+          "2": 2,
+          "a": 3,
+          "10": 4,
+          "1": 5,
+          "01": 6,
+          "-1": 7
+        },
+        "expected": "{\"1\":5,\"2\":2,\"10\":4,\"b\":1,\"a\":3,\"01\":6,\"-1\":7}"
+      },
+      {
+        "value": {
+          "pcursor": 2.5,
+          "k-1": 20,
+          "0": "#hash"
+        },
+        "expected": "{\"0\":\"#hash\",\"pcursor\":2.5,\"k-1\":20}"
+      },
+      {
+        "value": {
+          "x": 1.0,
+          "y": 1e-07,
+          "z": [
+            1.0,
+            null
+          ]
+        },
+        "expected": "{\"x\":1,\"y\":1e-7,\"z\":[1,null]}"
+      },
+      {
+        "value": {
+          "s": "中文😀",
+          "t": "a\"b\\c\nd"
+        },
+        "expected": "{\"s\":\"中文😀\",\"t\":\"a\\\"b\\\\c\\nd\"}"
+      },
+      {
+        "value": {
+          "u": "\u0001 行"
+        },
+        "expected": "{\"u\":\"\\u0001 行\"}"
+      },
+      {
+        "value": [
+          1,
+          null,
+          false,
+          0.30000000000000004
+        ],
+        "expected": "[1,null,false,0.30000000000000004]"
+      },
+      {
+        "value": "plain",
+        "expected": "\"plain\""
+      },
+      {
+        "value": null,
+        "expected": "null"
+      },
+      {
+        "value": true,
+        "expected": "true"
+      }
+    ],
+    "sorted": [
+      {
+        "value": [
+          "😀key",
+          "key",
+          "𝄞clef",
+          "tail",
+          "a",
+          "z"
+        ],
+        "expected": [
+          "a",
+          "z",
+          "𝄞clef",
+          "😀key",
+          "tail",
+          "key"
+        ]
+      }
+    ],
+    "encodeUri": [
+      {
+        "value": "[object Object]",
+        "expected": "%5Bobject%20Object%5D"
+      },
+      {
+        "value": "a b",
+        "expected": "a%20b"
+      },
+      {
+        "value": "中文",
+        "expected": "%E4%B8%AD%E6%96%87"
+      },
+      {
+        "value": "a/b?c=d&e=f",
+        "expected": "a/b?c=d&e=f"
+      },
+      {
+        "value": "#hash",
+        "expected": "#hash"
+      },
+      {
+        "value": "'\"\\",
+        "expected": "'%22%5C"
+      },
+      {
+        "value": "😀",
+        "expected": "%F0%9F%98%80"
+      },
+      {
+        "value": "a+b",
+        "expected": "a+b"
+      },
+      {
+        "value": ":",
+        "expected": ":"
+      },
+      {
+        "value": "$",
+        "expected": "$"
+      },
+      {
+        "value": ",",
+        "expected": ","
+      },
+      {
+        "value": "[",
+        "expected": "%5B"
+      },
+      {
+        "value": "]",
+        "expected": "%5D"
+      },
+      {
+        "value": " ",
+        "expected": "%20"
+      },
+      {
+        "value": "~",
+        "expected": "~"
+      },
+      {
+        "value": "!*()'",
+        "expected": "!*()'"
+      },
+      {
+        "value": "\n",
+        "expected": "%0A"
+      },
+      {
+        "value": "@/",
+        "expected": "@/"
+      },
+      {
+        "value": "HUDR_$HE_abc",
+        "expected": "HUDR_$HE_abc"
+      }
+    ],
+    "encodeUriComponent": [
+      {
+        "value": "[object Object]",
+        "expected": "%5Bobject%20Object%5D"
+      },
+      {
+        "value": "a b",
+        "expected": "a%20b"
+      },
+      {
+        "value": "中文",
+        "expected": "%E4%B8%AD%E6%96%87"
+      },
+      {
+        "value": "a/b?c=d&e=f",
+        "expected": "a%2Fb%3Fc%3Dd%26e%3Df"
+      },
+      {
+        "value": "#hash",
+        "expected": "%23hash"
+      },
+      {
+        "value": "'\"\\",
+        "expected": "'%22%5C"
+      },
+      {
+        "value": "😀",
+        "expected": "%F0%9F%98%80"
+      },
+      {
+        "value": "a+b",
+        "expected": "a%2Bb"
+      },
+      {
+        "value": ":",
+        "expected": "%3A"
+      },
+      {
+        "value": "$",
+        "expected": "%24"
+      },
+      {
+        "value": ",",
+        "expected": "%2C"
+      },
+      {
+        "value": "[",
+        "expected": "%5B"
+      },
+      {
+        "value": "]",
+        "expected": "%5D"
+      },
+      {
+        "value": " ",
+        "expected": "%20"
+      },
+      {
+        "value": "~",
+        "expected": "~"
+      },
+      {
+        "value": "!*()'",
+        "expected": "!*()'"
+      },
+      {
+        "value": "\n",
+        "expected": "%0A"
+      },
+      {
+        "value": "@/",
+        "expected": "%40%2F"
+      },
+      {
+        "value": "HUDR_$HE_abc",
+        "expected": "HUDR_%24HE_abc"
+      }
+    ]
+  },
+  "primitives": {
+    "blake": [
+      {
+        "text": "",
+        "expected": "7ecb2c401228df4bb59bec4ad76a05d245986f35b8f2c23dbbfd9be3708bf31a"
+      },
+      {
+        "text": "hello",
+        "expected": "7dad15489bfb85ac1f9d70df54500abedaf391f354d6285aa6c178b745526924"
+      },
+      {
+        "text": "中文😀",
+        "expected": "dda53744608016ce059ac94ba490d38f5919e1dcf38263bacb09c6e7e517f2cb"
+      },
+      {
+        "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "expected": "27c67e92471142ada829ef7c8935172df25f80110b35b6b71a55b126fb18ef19"
+      },
+      {
+        "text": "/rest/v/profile/getcaver=2",
+        "expected": "a9b59b1ae07839cf396b574ab98ceb020c8d83c67c4f0bb450848d74bdf1886c"
+      }
+    ],
+    "chacha": [
+      {
+        "inputHex": "",
+        "expectedHex": ""
+      },
+      {
+        "inputHex": "000102",
+        "expectedHex": "be46f6"
+      },
+      {
+        "inputHex": "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f",
+        "expectedHex": "be46f6da584a24657c9be9e7045ae113aa17871b7e45f207b41c48cbf2c6e94fd917bf39065a80c4f9ad66c7fff0a909d735e71716103c8a02707706c2c78ba5"
+      },
+      {
+        "inputHex": "030a11181f262d343b424950575e656c737a81888f969da4abb2b9c0c7ced5dce3eaf1f8ff060d141b222930373e454c535a61686f767d848b9299a0a7aeb5bcc3cad1d8dfe6edf4fb020910171e252c",
+        "expectedHex": "bd4de5c143690f564fd0aabc5f098a70c97c1480e5c679b407b7eb102915228c1adc6ce2dd79abf7caa665dce4e3c26ab45eb44c4d537739b1dbd49d5954002626f04718ce36afc2d75e9d031cfef9bf"
+      },
+      {
+        "inputHex": "e5bfabe6898b",
+        "expectedHex": "5bf85f3fd5c4"
+      }
+    ],
+    "devicePrefix": [
+      {
+        "scriptsLen": 24,
+        "guardCount": 100,
+        "secsStack": "spatchRequest (https://p23-plat.wskwai.com/kos/nlav111422/ks-web/assets/index-bZyTA7JL.js:32:235479)",
+        "secsCount": 100,
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif"
+      },
+      {
+        "scriptsLen": 0,
+        "guardCount": 0,
+        "secsStack": "",
+        "secsCount": 0,
+        "expected": "HUDR_sFnX-DtsAUFXsbDPK3TMP-sktis6c8czjyY."
+      },
+      {
+        "scriptsLen": 7,
+        "guardCount": 256,
+        "secsStack": "中😀",
+        "secsCount": 3,
+        "expected": "HUDR_sFnX-DtsBkFXsbDPK3XMP-sktCtkc7QzjCZx8w.."
+      },
+      {
+        "scriptsLen": 4294967296,
+        "guardCount": 1,
+        "secsStack": "ab",
+        "secsCount": 2,
+        "expected": "HUDR_sFnX-Dts_r6oTrDPKnTMP-sktCsoEbQzjSZx8w.."
+      }
+    ]
+  },
+  "hxfalcon": {
+    "cases": [
+      {
+        "path": "/rest/v/profile/get",
+        "method": "POST",
+        "query": null,
+        "body": {
+          "page": "profile",
+          "caption": "你好😀\"\\",
+          "1": 5,
+          "10": 4,
+          "2": 2,
+          "nested": {
+            "b": 1,
+            "a": [
+              null,
+              false,
+              1.0
+            ]
+          },
+          "flag": true
+        },
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/profile/getcaver=2{\"1\":5,\"2\":2,\"10\":4,\"page\":\"profile\",\"caption\":\"你好😀\\\"\\\\\",\"nested\":{\"b\":1,\"a\":[null,false,1]},\"flag\":true}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_19069efbf9292e7b4dc6532b8d5fd41a2253525252538dcafee8418a74ea62813385c653c9046c8829046cba52"
+      },
+      {
+        "path": "/rest/v/profile/user/v2",
+        "method": "GET",
+        "query": {
+          "page": 1,
+          "k": "v"
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 101,
+        "guardCount": 101,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700457,
+        "rand48": 123456789012346,
+        "expectedSerialize": "/rest/v/profile/user/v2caver=2k=vpage=1",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPTnTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUkhQif$HE_bca33b5e5c8c8bdee863f68d28fa71bf87f6f7f7f7f6296f5b4db77d8312c624962063f66ca1c92d8ca1c91ff7"
+      },
+      {
+        "path": "/rest/v/search/user",
+        "method": "POST",
+        "query": {
+          "page": 2,
+          "k": "v"
+        },
+        "body": {
+          "page": "profile",
+          "caption": "你好😀\"\\",
+          "1": 5,
+          "10": 4,
+          "2": 2,
+          "nested": {
+            "b": 1,
+            "a": [
+              null,
+              false,
+              1.0
+            ]
+          },
+          "flag": true
+        },
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 102,
+        "guardCount": 102,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700458,
+        "rand48": 123456789012347,
+        "expectedSerialize": "/rest/v/search/usercaver=2k=vpage=2{\"1\":5,\"2\":2,\"10\":4,\"page\":\"profile\",\"caption\":\"你好😀\\\"\\\\\",\"nested\":{\"b\":1,\"a\":[null,false,1]},\"flag\":true}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPTXTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUnhQif$HE_554ad2b7b5656237018a1f65c11398566e1f1e1e1e1fc386b2a45fc33aa72ccd7fc98a1f854820c4654820f61e"
+      },
+      {
+        "path": "/rest/v/search/feed",
+        "method": "GET",
+        "query": null,
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 103,
+        "guardCount": 103,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700459,
+        "rand48": 123456789012348,
+        "expectedSerialize": "/rest/v/search/feedcaver=2",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPTHTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUmhQif$HE_3e21b9dcde0e095c6ae17409aa78f33d057475757574a9edd9cf63fd549146a614a2e174ee234baf0e234b9d75"
+      },
+      {
+        "path": "/rest/v/profile/feed",
+        "method": "POST",
+        "query": {
+          "page": 4,
+          "k": "v"
+        },
+        "body": {
+          "page": "profile",
+          "caption": "你好😀\"\\",
+          "1": 5,
+          "10": 4,
+          "2": 2,
+          "nested": {
+            "b": 1,
+            "a": [
+              null,
+              false,
+              1.0
+            ]
+          },
+          "flag": true
+        },
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 104,
+        "guardCount": 104,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700460,
+        "rand48": 123456789012349,
+        "expectedSerialize": "/rest/v/profile/feedcaver=2k=vpage=4{\"1\":5,\"2\":2,\"10\":4,\"page\":\"profile\",\"caption\":\"你好😀\\\"\\\\\",\"nested\":{\"b\":1,\"a\":[null,false,1]},\"flag\":true}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPQ3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUphQif$HE_312eb6d3d101065365ee7b07a577fc320a7b7a7a7a7ba9e2d6c039f05ece4ea91badee7be12c44a0012c44927a"
+      },
+      {
+        "path": "/rest/v/feed/hot",
+        "method": "GET",
+        "query": {
+          "page": 5,
+          "k": "v"
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 105,
+        "guardCount": 105,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700461,
+        "rand48": 123456789012350,
+        "expectedSerialize": "/rest/v/feed/hotcaver=2k=vpage=5",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPQnTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUohQif$HE_120d95f0f222257046cd58278654df112958595959588bc1f5e34b8578ef6c8a388ecd58c20f6783220f67b159"
+      },
+      {
+        "path": "/rest/v/feed/liked",
+        "method": "POST",
+        "query": null,
+        "body": {
+          "page": "profile",
+          "caption": "你好😀\"\\",
+          "1": 5,
+          "10": 4,
+          "2": 2,
+          "nested": {
+            "b": 1,
+            "a": [
+              null,
+              false,
+              1.0
+            ]
+          },
+          "flag": true
+        },
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 106,
+        "guardCount": 106,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700462,
+        "rand48": 123456789012351,
+        "expectedSerialize": "/rest/v/feed/likedcaver=2{\"1\":5,\"2\":2,\"10\":4,\"page\":\"profile\",\"caption\":\"你好😀\\\"\\\\\",\"nested\":{\"b\":1,\"a\":[null,false,1]},\"flag\":true}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPQXTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUrhQif$HE_425dc5a0a2727520169d0876d6048f41790809090908d891a5b31ad378bf3fda68de9d08925f37d3725f37e109"
+      },
+      {
+        "path": "/rest/v/collect/list",
+        "method": "GET",
+        "query": {
+          "page": 7,
+          "k": "v"
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 107,
+        "guardCount": 107,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700463,
+        "rand48": 123456789012352,
+        "expectedSerialize": "/rest/v/collect/listcaver=2k=vpage=7",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPQHTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUqhQif$HE_100f97f2f020277244cf5adb8456dd132b5a5b5b5b5a8bc3f7e148817feb6c883a8ccf5ac00d6581200d65b35b"
+      },
+      {
+        "path": "/rest/v/profile/private/list",
+        "method": "POST",
+        "query": {
+          "page": 8,
+          "k": "v"
+        },
+        "body": {
+          "page": "profile",
+          "caption": "你好😀\"\\",
+          "1": 5,
+          "10": 4,
+          "2": 2,
+          "nested": {
+            "b": 1,
+            "a": [
+              null,
+              false,
+              1.0
+            ]
+          },
+          "flag": true
+        },
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 108,
+        "guardCount": 108,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700464,
+        "rand48": 123456789012353,
+        "expectedSerialize": "/rest/v/profile/private/listcaver=2k=vpage=8{\"1\":5,\"2\":2,\"10\":4,\"page\":\"profile\",\"caption\":\"你好😀\\\"\\\\\",\"nested\":{\"b\":1,\"a\":[null,false,1]},\"flag\":true}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPR3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUthQif$HE_2837afcac8181f4a7cf762e2bc6ee52b136263636362b4fbcfd974bb42d34bb002b4f762f8355db918355d8b63"
+      },
+      {
+        "path": "/rest/v/profile/get",
+        "method": "POST",
+        "query": {
+          "user_id": "3xabc",
+          "count": 20,
+          "pcursor": 2.5,
+          "photoId": "中文😀",
+          "liked": true,
+          "muted": false,
+          "empty": null,
+          "ratio": 1.5e-07,
+          "fuzzy": 0.30000000000000004,
+          "tags": [
+            1,
+            null,
+            "二"
+          ],
+          "extra": {
+            "id": 1
+          },
+          "__NS_hxfalcon": "should-skip",
+          "k-1": "a b"
+        },
+        "body": "{\"page\": \"profile\", \"caption\": \"你好😀\\\"\\\\\", \"1\": 5, \"10\": 4, \"2\": 2, \"nested\": {\"b\": 1, \"a\": [null, false, 1.0]}, \"flag\": true}",
+        "contentType": "application/json; charset=UTF-8",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/profile/getcaver=2count=20empty=extra=[object Object]fuzzy=0.30000000000000004k-1=a bliked=truemuted=falsepcursor=2.5photoId=中文😀ratio=1.5e-7tags=1,,二user_id=3xabc{\"1\":5,\"2\":2,\"10\":4,\"page\":\"profile\",\"caption\":\"你好😀\\\"\\\\\",\"nested\":{\"b\":1,\"a\":[null,false,1]},\"flag\":true}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_d7c8503537e7e0b583089de543911ad4ec9d9c9c9c9d43043026dc42e27fac4ffd4b089d07caa246e7caa2749c"
+      },
+      {
+        "path": "/rest/v/profile/feed",
+        "method": "POST",
+        "query": {},
+        "body": "not-json",
+        "contentType": "Application/JSON",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 281474976710655,
+        "count": 0,
+        "guardCount": 0,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 4294967301,
+        "rand48": 281474976710655,
+        "expectedSerialize": "/rest/v/profile/feedcaver=2\"not-json\"",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPK3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bVBhQif$HE_b5aa325755010101010101010101010101fffefefeff45665244eb208a18a329b436fffe65a8c02485a8c016fe"
+      },
+      {
+        "path": "https://www.kuaishou.com/rest/v/profile/get?foo=1",
+        "method": "GET",
+        "query": {
+          "x": 1
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/profile/getcaver=2x=1",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_e3fc640103d3d481b73ca9d177a52ee0d8a9a8a8a8a977300412eb72dc4a987bc97f3ca933fe9672d3fe9640a8"
+      },
+      {
+        "path": "https://id.kuaishou.com/pass/kuaishou/login/mobileCode",
+        "method": "POST",
+        "query": null,
+        "body": {
+          "mobile": "13800138000",
+          "code": "中文"
+        },
+        "contentType": "application/x-www-form-urlencoded",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 250,
+        "guardCount": 80,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 4294967301,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/pass/kuaishou/login/mobileCodecaver=2code=中文mobile=13800138000{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPe3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bW7hQif$HE_7669f1949646411422a93c44e230bb754d3c3d3d3d3c7ca5918726b743df60ea77f53c3da66b03e7466b03d53d"
+      },
+      {
+        "path": "/rest/v/feed/hot?page=1",
+        "method": "GET",
+        "query": {
+          "page": "1"
+        },
+        "body": "{}",
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/feed/hotcaver=2page=1",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_8e91096c6ebeb9ecda51c4bc1ac8438db5c4c5c5c5c41a5d697fd11aba21f516a41251c45e93fb1fbe93fb2dc5"
+      },
+      {
+        "path": "/rest/v/search/feed",
+        "method": "POST",
+        "query": {
+          "keyword": "快手"
+        },
+        "body": "[]",
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/search/feedcaver=2keyword=快手",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_6a75ed888a5a5d083eb52058fe2ca769512021212120feb98d9b36ae51c511f240f6b520ba771ffb5a771fc921"
+      },
+      {
+        "path": "/rest/v/profile/get",
+        "method": "POST",
+        "query": null,
+        "body": "0",
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/profile/getcaver=2",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_1b049cf9fb2b2c794fc451298f5dd6182051505050518fc8fcea46dd24e460833187c451cb066e8a2b066eb850"
+      },
+      {
+        "path": "/rest/v/profile/get",
+        "method": "POST",
+        "query": null,
+        "body": "false",
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/profile/getcaver=2{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_170890f5f727207543c85d258351da142c5d5c5c5c5d83c4f0e64f8e7de56c8f3d8bc85dc70a6286270a62b45c"
+      },
+      {
+        "path": "/rest/k/live/websocket/info",
+        "method": "GET",
+        "query": {
+          "liveStreamId": "abc"
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 130,
+        "guardCount": 130,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43469,
+        "nowMs": 1735689700456,
+        "rand48": 99,
+        "expectedSerialize": "/rest/k/live/websocket/infocaver=2liveStreamId=abc{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPqXTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bXDhQif$HE_736cf5919343441127ac395b3838383838393838383901a094822de5198d08eb59efac39a36e06e2436e06d038"
+      },
+      {
+        "path": "/rest/k/photo/comment/list",
+        "method": "GET",
+        "query": {
+          "count": 10,
+          "page": 1,
+          "pcursor": "",
+          "photoId": "p"
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 130,
+        "guardCount": 130,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43469,
+        "nowMs": 1735689700456,
+        "rand48": 99,
+        "expectedSerialize": "/rest/k/photo/comment/listcaver=2count=10page=1pcursor=photoId=p{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPqXTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bXDhQif$HE_9c831a7e7cacabfec843d6b4d7d7d7d7d7d6d7d7d7d6ee4f7b6dc009a961e704b60043d64c81e90dac81e93fd7"
+      },
+      {
+        "path": "/rest/k/live/like",
+        "method": "POST",
+        "query": {
+          "liveStreamId": "9"
+        },
+        "body": {
+          "count": 1
+        },
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 130,
+        "guardCount": 130,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43469,
+        "nowMs": 1735689700456,
+        "rand48": 99,
+        "expectedSerialize": "/rest/k/live/likecaver=2liveStreamId=9{\"count\":1}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPqXTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bXDhQif$HE_aeb1284c4e9e99ccfa71e486e5e5e5e5e5e4e5e5e5e4dc7d495ff63d9b57d536843271e47eb3db3f9eb3db0de5"
+      },
+      {
+        "path": "/rest/k/user/info",
+        "method": "GET",
+        "query": null,
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 130,
+        "guardCount": 130,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43469,
+        "nowMs": 1735689700456,
+        "rand48": 99,
+        "expectedSerialize": "/rest/k/user/infocaver=2{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPqXTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bXDhQif$HE_a2bd2440429295c0f67de88ae9e9e9e9e9e8e9e9e9e8d0714553f23a9851d93a883e7de872bfd73392bfd701e9"
+      },
+      {
+        "path": "/rest/c/infra/ks/qr/start",
+        "method": "POST",
+        "query": {},
+        "body": {
+          "sid": "kuaishou.server.web",
+          "channelType": "PC_PAGE",
+          "isWebSig4": "true"
+        },
+        "contentType": "application/x-www-form-urlencoded",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 140,
+        "guardCount": 141,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/c/infra/ks/qr/startcaver=2channelType=PC_PAGEisWebSig4=truesid=kuaishou.server.web{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPpnTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bXNhQif$HE_b5aa3257558582d7e16aff8721f378b68efffefefeffc9665244ee23df49ce2d9f296aff65a8c02485a8c016fe"
+      },
+      {
+        "path": "/rest/c/infra/ks/qr/scanResult",
+        "method": "POST",
+        "query": {},
+        "body": {
+          "qrLoginToken": "tok",
+          "qrLoginSignature": "sig",
+          "channelType": "PC_PAGE",
+          "isWebSig4": "true"
+        },
+        "contentType": "application/x-www-form-urlencoded",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 140,
+        "guardCount": 141,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/c/infra/ks/qr/scanResultcaver=2channelType=PC_PAGEisWebSig4=trueqrLoginSignature=sigqrLoginToken=tok{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPpnTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bXNhQif$HE_bca33b5e5c8c8bdee863f68e28fa71bf87f6f7f7f7f6c06f5b4de528d142c724962063f66ca1c92d8ca1c91ff7"
+      },
+      {
+        "path": "/pass/kuaishou/sms/requestMobileCode",
+        "method": "POST",
+        "query": {},
+        "body": {
+          "mobile": "+8613800138000",
+          "mobileCountryCode": "+86",
+          "type": "53"
+        },
+        "contentType": "application/x-www-form-urlencoded",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 140,
+        "guardCount": 141,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/pass/kuaishou/sms/requestMobileCodecaver=2mobile=+8613800138000mobileCountryCode=+86type=53{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPpnTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bXNhQif$HE_3a25bdd8da0a0d586ee57008ae7cf73901707171717046e9ddcb35a90fc941a210a6e570ea274fab0a274f9971"
+      },
+      {
+        "path": "/pass/kuaishou/login/qr/callback",
+        "method": "POST",
+        "query": {
+          "from": "live"
+        },
+        "body": "{\"qrToken\": \"中文\"}",
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/pass/kuaishou/login/qr/callbackcaver=2from=live{\"qrToken\":\"中文\"}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_6778e0858757500533b82d55f321aa645c2d2c2c2c2df3b480963ff50dce1cff4dfbb82db77a12f6577a12c42c"
+      },
+      {
+        "path": "/rest/cp/works/v2/video/pc/submit",
+        "method": "POST",
+        "query": {
+          "kpn": "KUAISHOU_VISION"
+        },
+        "body": {
+          "caption": "发布😀",
+          "photoId": 42
+        },
+        "contentType": "application/json",
+        "projectInfo": {
+          "appKey": "mMovf2dVDF",
+          "debug": false,
+          "sampling": 1
+        },
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 160,
+        "guardCount": 160,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/cp/works/v2/video/pc/submitcaver=2kpn=KUAISHOU_VISION{\"caption\":\"发布😀\",\"photoId\":42}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPi3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bXhhQif$HE_455ac2a7a5757227119a0f77d10388467e0f0e0e0e0f1596a2b41d8471bb3edd6fd99a0f955830d4755830e60e"
+      },
+      {
+        "path": "https://cp.kuaishou.com/rest/cp/works/v2/common/pc/nearby?x=1",
+        "method": "POST",
+        "query": null,
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": {
+          "appKey": "mMovf2dVDF",
+          "debug": false,
+          "sampling": 1
+        },
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/cp/works/v2/common/pc/nearbycaver=2",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_6e71e98c8e5e590c3ab1245cfa28a36d552425252524fabd899f3ff600c115f644f2b124be731bff5e731bcd25"
+      },
+      {
+        "path": "/rest/v/profile/get",
+        "method": "GET",
+        "query": {
+          "n": 1
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1000,
+        "count": 3,
+        "guardCount": 9,
+        "scriptsLen": 7,
+        "secsStack": "中😀",
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/profile/getcaver=2n=1",
+        "expected": "HUDR_sFnX-DtsBkFXsbDPInTMP-sktCtkc7QzjCZx8w..$HE_736cf49193d03b3838383841e735be7048393838383980a0948278b2488108eb59efac39a36e06e2436e06d038"
+      },
+      {
+        "path": "/rest/v/feed/hot",
+        "method": "GET",
+        "query": null,
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 4294967295,
+        "guardCount": 4294967295,
+        "scriptsLen": 4294967296,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 1,
+        "expectedSerialize": "/rest/v/feed/hotcaver=2",
+        "expected": "HUDR_sFnX-Dts_r6oTrDP1IszwOsk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bW-evdg$HE_7a65fd989a4a4d182ea53030313131313130313131307556627475e914d401e250e6a530aa670feb4a670fd931"
+      },
+      {
+        "path": "/rest/cp/works/v2/video/pc/edit/info",
+        "method": "POST",
+        "query": null,
+        "body": {
+          "photoId": "1"
+        },
+        "contentType": "application/json",
+        "projectInfo": {
+          "appKey": "mMovf2dVDF",
+          "debug": false,
+          "sampling": 1
+        },
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 300,
+        "guardCount": 300,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/cp/works/v2/video/pc/edit/infocaver=2{\"photoId\":\"1\"}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPB3XMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bVthAif$HE_243ba3c6c414134670fb6e16b062e9271f6e6f6f6f6ef8f6c3d52eb54dd95fbc0eb8fb6ef43951b5143951876f"
+      },
+      {
+        "path": "/rest/zt/location/wi/poi/search",
+        "method": "POST",
+        "query": {
+          "keyword": "北京"
+        },
+        "body": {
+          "page": 1
+        },
+        "contentType": "application/json",
+        "projectInfo": {
+          "appKey": "mMovf2dVDF",
+          "debug": false,
+          "sampling": 1
+        },
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 301,
+        "guardCount": 301,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 4294967301,
+        "rand48": 42,
+        "expectedSerialize": "/rest/zt/location/wi/poi/searchcaver=2keyword=北京{\"page\":1}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPBnXMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bVshAif$HE_a6b92144469691c4f279ecc7edededededecedededec7b744157ae309a0cb03aa725eced76bbd33796bbd305ed"
+      },
+      {
+        "path": "/rest/cp/works/v2/common/pc/ip2poi",
+        "method": "GET",
+        "query": null,
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": {
+          "appKey": "mMovf2dVDF",
+          "debug": false,
+          "sampling": 1
+        },
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 302,
+        "guardCount": 302,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/cp/works/v2/common/pc/ip2poicaver=2",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPBXXMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bVvhAif$HE_504fd7b2b0606732048f1a62c4169d536b1a1b1b1b1a8e82b7a10fc468f82bc87acc8f1a804d25c1604d25f31b"
+      },
+      {
+        "path": "/pass/kuaishou/login/mobileCode",
+        "method": "POST",
+        "query": null,
+        "body": {
+          "mobile": "13900000000",
+          "code": "2468"
+        },
+        "contentType": "application/x-www-form-urlencoded",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 303,
+        "guardCount": 303,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/pass/kuaishou/login/mobileCodecaver=2code=2468mobile=13900000000{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPBHXMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bVuhAif$HE_203fa7c2c010174274ff6a12b466ed231b6a6b6b6b6afff2c7d17cb54a8f5bb80abcff6af03d55b1103d55836b"
+      },
+      {
+        "path": "/pass/bid/web/sns/quickLoginByKsAuth",
+        "method": "POST",
+        "query": null,
+        "body": {
+          "code": "abc"
+        },
+        "contentType": "application/x-www-form-urlencoded",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 304,
+        "guardCount": 304,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 281474976710655,
+        "expectedSerialize": "/pass/bid/web/sns/quickLoginByKsAuthcaver=2code=abc{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPG3XMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bVxhAif$HE_b4ab3356548483d6e06bfe000000000000fefffffffe74665345e5248f4ccf2c9e286bfe64a9c12584a9c117ff"
+      },
+      {
+        "path": "/rest/k/playback/product/list",
+        "method": "GET",
+        "query": {
+          "authorId": "9",
+          "page": "2"
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 305,
+        "guardCount": 305,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43469,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/k/playback/product/listauthorId=9caver=2page=2{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPGnXMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bVwhAif$HE_b9a63f5b59898edbed66f38b2dff74ba82f3f2f2f2f3786b5e48e87dd340c221932566f369a4cc2889a4cc1af2"
+      },
+      {
+        "path": "/rest/wd/live/liveStream/status",
+        "method": "GET",
+        "query": {
+          "liveStreamId": "ls"
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 306,
+        "guardCount": 306,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43469,
+        "nowMs": 4294967301,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/wd/live/liveStream/statuscaver=2liveStreamId=ls{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPGXXMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bVzhAif$HE_19069ffbf9292e7b4dc6532b8d5fd41a225352525253dbcbfee812df73ea0f85189a5352c9046c8829046cba52"
+      },
+      {
+        "path": "/rest/v/profile/user/v2",
+        "method": "POST",
+        "query": null,
+        "body": {
+          "file": "x"
+        },
+        "contentType": "multipart/form-data",
+        "projectInfo": null,
+        "omitEmptyBody": false,
+        "startupRandom": 1735689600123,
+        "count": 307,
+        "guardCount": 307,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/profile/user/v2caver=2{}",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPGHXMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bVyhAif$HE_b6a93154568681d4e269fc8422f07bb58dfcfdfdfdfc75645147bd238d1bcd2e9c2a69fc66abc32786abc315fd"
+      },
+      {
+        "path": "/rest/v/profile/get",
+        "method": "POST",
+        "query": null,
+        "body": "\"hello\"",
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 1735689600123,
+        "count": 308,
+        "guardCount": 308,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 0,
+        "rand48": 0,
+        "expectedSerialize": "/rest/v/profile/getcaver=2\"hello\"",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPH3XMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bV1hAif$HE_170890f5f727207543c85d5c5c5c5c5c5c5d5c5c5c5dd3c5f0e61a8f2ceb048b16945c5cc70a6286270a62b45c"
+      },
+      {
+        "path": "/rest/v/search/user",
+        "method": "GET",
+        "query": {
+          "user": "name",
+          "page": 0,
+          "ok": false
+        },
+        "body": null,
+        "contentType": "application/json",
+        "projectInfo": null,
+        "omitEmptyBody": true,
+        "startupRandom": 42,
+        "count": 309,
+        "guardCount": 309,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "nowMs": 1735689700456,
+        "rand48": 123456789012345,
+        "expectedSerialize": "/rest/v/search/usercaver=2ok=falsepage=0user=name",
+        "expected": "HUDR_sFnX-DtsGUFXsbDPHnXMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bV0hAif$HE_1c039bfefc7d57575757572e885ad11f275657575756d9cefbed46df23e667843680c356cc01698d2c0169bf57"
+      }
+    ],
+    "sequential": [
+      {
+        "startupRandom": 1735689600123,
+        "count": 100,
+        "guardCount": 100,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43468,
+        "calls": [
+          {
+            "path": "/rest/v/profile/get",
+            "method": "GET",
+            "query": {
+              "a": 1
+            },
+            "body": null,
+            "contentType": "application/json",
+            "omitEmptyBody": true,
+            "nowMs": 1735689700456,
+            "rand48": 11,
+            "projectInfo": null,
+            "expectedSerialize": "/rest/v/profile/geta=1caver=2",
+            "expected": "HUDR_sFnX-DtsGUFXsbDPT3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUlhQif$HE_dcc35b3e3cecebbe8803969c97979797979697979796480f3b2d8549e121a744f64003960cc1a94decc1a97f97"
+          },
+          {
+            "path": "/rest/v/profile/feed",
+            "method": "POST",
+            "query": {
+              "b": "二"
+            },
+            "body": {
+              "p": "cursor"
+            },
+            "contentType": "application/json",
+            "omitEmptyBody": true,
+            "nowMs": 1735689700461,
+            "rand48": 22,
+            "projectInfo": null,
+            "expectedSerialize": "/rest/v/profile/feedb=二caver=2{\"p\":\"cursor\"}",
+            "expected": "HUDR_sFnX-DtsGUFXsbDPTnTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUkhQif$HE_908f177270a0a7f2c44fdacddbdbdbdbdbdadbdbdbda05437761c906fa62ee08ba0c4fda408de501a08de533db"
+          },
+          {
+            "path": "/rest/v/search/user",
+            "method": "POST",
+            "query": null,
+            "body": {
+              "keyword": "快手"
+            },
+            "contentType": "application/json",
+            "omitEmptyBody": true,
+            "nowMs": 4294967301,
+            "rand48": 281474976710655,
+            "projectInfo": null,
+            "expectedSerialize": "/rest/v/search/usercaver=2{\"keyword\":\"快手\"}",
+            "expected": "HUDR_sFnX-DtsGUFXsbDPTXTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUnhQif$HE_8699016466b6b1e4d259cc323232323232cccdcdcdcc10556177d743ef75901a8705cccd569bf317b69bf325cd"
+          },
+          {
+            "path": "/rest/v/feed/liked",
+            "method": "GET",
+            "query": {
+              "page": 3
+            },
+            "body": "",
+            "contentType": "application/json",
+            "omitEmptyBody": true,
+            "nowMs": 1000,
+            "rand48": 0,
+            "projectInfo": null,
+            "expectedSerialize": "/rest/v/feed/likedcaver=2page=3",
+            "expected": "HUDR_sFnX-DtsGUFXsbDPTHTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUmhQif$HE_7867ff9a98484f1a2ca7323333333333333233333332efab9f8927bc418083e779fb3333a8650de948650ddb33"
+          },
+          {
+            "path": "/rest/v/collect/list",
+            "method": "POST",
+            "query": {
+              "x": null
+            },
+            "body": {
+              "flag": false,
+              "n": 0
+            },
+            "contentType": "application/json",
+            "omitEmptyBody": true,
+            "nowMs": 1735689700456,
+            "rand48": 7,
+            "projectInfo": null,
+            "expectedSerialize": "/rest/v/collect/listcaver=2x={\"flag\":false,\"n\":0}",
+            "expected": "HUDR_sFnX-DtsGUFXsbDPQ3TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bUphQif$HE_859a026765b5b2e7d15acfc9cecececececfcecececf1d5662748d47b97cfe1daf195acf5598f014b598f026ce"
+          }
+        ],
+        "expectedCount": 105,
+        "expectedGuard": 105
+      },
+      {
+        "startupRandom": 1735689600123,
+        "count": 200,
+        "guardCount": 200,
+        "scriptsLen": 24,
+        "secsStack": null,
+        "sdkVersion": 43469,
+        "calls": [
+          {
+            "path": "/rest/k/live/websocket/info",
+            "method": "GET",
+            "query": {
+              "liveStreamId": "s1"
+            },
+            "body": null,
+            "contentType": "application/json",
+            "omitEmptyBody": false,
+            "nowMs": 1735689700456,
+            "rand48": 3,
+            "projectInfo": null,
+            "expectedSerialize": "/rest/k/live/websocket/infocaver=2liveStreamId=s1{}",
+            "expected": "HUDR_sFnX-DtsGUFXsbDP43TMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bWJhQif$HE_e2fd640002d2d580b63da8aaa9a9a9a9a9a8a9a9a9a8da310513b3208a1e997ac87e3da832ff9773d2ff9741a9"
+          },
+          {
+            "path": "/rest/k/live/like",
+            "method": "POST",
+            "query": {
+              "liveStreamId": "s1"
+            },
+            "body": {
+              "c": 1
+            },
+            "contentType": "application/json",
+            "omitEmptyBody": false,
+            "nowMs": 1735689700465,
+            "rand48": 4,
+            "projectInfo": null,
+            "expectedSerialize": "/rest/k/live/likecaver=2liveStreamId=s1{\"c\":1}",
+            "expected": "HUDR_sFnX-DtsGUFXsbDP4nTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bWIhQif$HE_0e1188ecee3e396c5ad144414545454545444545454437dde9ff519764a46c962492d144de137b9f3e137bad45"
+          },
+          {
+            "path": "/rest/k/photo/comment/list",
+            "method": "GET",
+            "query": {
+              "photoId": "中",
+              "count": 20
+            },
+            "body": null,
+            "contentType": "application/json",
+            "omitEmptyBody": false,
+            "nowMs": 4294967301,
+            "rand48": 5,
+            "projectInfo": null,
+            "expectedSerialize": "/rest/k/photo/comment/listcaver=2count=20photoId=中{}",
+            "expected": "HUDR_sFnX-DtsGUFXsbDP4XTMP-sk0is6A6ZH7E4jlryNsQCuNZZRdSj1s8iIQL_CzYl1qEaCKXZ1Qul4A0B9srS50qlqmo1ekhckPk6DAhrslMP3hB67Z7lgc3p-2cIjWWAFDvwSRQLu6-_7QxYIzhKdDXvJ7k1ZiNdT-bWLhQif$HE_2a35acc8ca1a1d487ef560646161616161606161616010f9cddb77bf14843cb62ba96061fa375fbb1a375f8961"
+          }
+        ],
+        "expectedCount": 203,
+        "expectedGuard": 203
+      }
+    ]
+  },
+  "sig3": {
+    "samples": [
+      {
+        "api": "/rest/cp/works/v2/common/pc/current/user",
+        "sig": "31216656bf801508196c6f6e5e1ec0e5b450f814707072727d7c7f65",
+        "plainHex": "54450130dee0766a740000003776ab8fc1248f620100010000000065",
+        "startupRandom": 1786175710,
+        "count": 116,
+        "digestHex": "3776ab8f",
+        "build": 1653548225,
+        "checksumOk": true,
+        "magicHex": "5445",
+        "versionHex": "0130",
+        "flagsHex": "01000100000000"
+      },
+      {
+        "api": "/rest/cp/works/v2/video/pc/upload/config",
+        "sig": "34246353ba85100d11696a6b5b1bc5e0b155fd117575777778797a60",
+        "plainHex": "54450130dee0766a790000003776ab8fc1248f620100010000000060",
+        "startupRandom": 1786175710,
+        "count": 121,
+        "digestHex": "3776ab8f",
+        "build": 1653548225,
+        "checksumOk": true,
+        "magicHex": "5445",
+        "versionHex": "0130",
+        "flagsHex": "01000100000000"
+      },
+      {
+        "api": "/rest/cp/works/atlas/pc/upload/config",
+        "sig": "32226555bc83160b1d6f6c6d5d1dc3e6b753fb17737371717e7f7c66",
+        "plainHex": "54450130dee0766a730000003776ab8fc1248f620100010000000066",
+        "startupRandom": 1786175710,
+        "count": 115,
+        "digestHex": "3776ab8f",
+        "build": 1653548225,
+        "checksumOk": true,
+        "magicHex": "5445",
+        "versionHex": "0130",
+        "flagsHex": "01000100000000"
+      },
+      {
+        "api": "/rest/cp/works/v2/collection/tab",
+        "sig": "3a2a6d5db48b1e030d6764655515cbeebf5bf31f7b7b79797677746e",
+        "plainHex": "54450130dee0766a6b0000003776ab8fc1248f62010001000000006e",
+        "startupRandom": 1786175710,
+        "count": 107,
+        "digestHex": "3776ab8f",
+        "build": 1653548225,
+        "checksumOk": true,
+        "magicHex": "5445",
+        "versionHex": "0130",
+        "flagsHex": "01000100000000"
+      },
+      {
+        "api": "/rest/cp/works/v2/common/pc/w/info",
+        "sig": "d3c384b45d62f7eafa8e8d8c3f6254c356b21af6929290909f9e9d87",
+        "plainHex": "54450130dee0766a75000000b4e8dd4bc1248f620100010000000087",
+        "startupRandom": 1786175710,
+        "count": 117,
+        "digestHex": "b4e8dd4b",
+        "build": 1653548225,
+        "checksumOk": true,
+        "magicHex": "5445",
+        "versionHex": "0130",
+        "flagsHex": "01000100000000"
+      }
+    ],
+    "digests": [
+      {
+        "md5": "d41d8cd98f00b204e9800998ecf8427e",
+        "expectedHex": "023d459c"
+      },
+      {
+        "md5": "900150983cd24fb0d6963f7d28e17f72",
+        "expectedHex": "0b96aa6e"
+      },
+      {
+        "md5": "a7bac2239fcdcb3a067903d8077c4a07",
+        "expectedHex": "126c28e5"
+      },
+      {
+        "md5": "42b7b4f2921788ea14dac5566e6f06d0",
+        "expectedHex": "dfb3e8a3"
+      }
+    ],
+    "md5": [
+      {
+        "query": {},
+        "body": {},
+        "type": "json",
+        "expected": "99914b932bd37a50b983c5e7c90ae93b",
+        "digestHex": "02fbe7b9"
+      },
+      {
+        "query": {
+          "b": "2",
+          "a": "1"
+        },
+        "body": {
+          "caption": "你好😀",
+          "1": 5,
+          "10": 1
+        },
+        "type": "json",
+        "expected": "15b8f9f58fa98bcefefcbf33ea6154d4",
+        "digestHex": "ed2933f5"
+      },
+      {
+        "query": {
+          "z": "尾"
+        },
+        "body": {
+          "mobile": "+86",
+          "type": "53"
+        },
+        "type": "form-data",
+        "expected": "42ec3c136ab18c3bb4f35aa900bf4409",
+        "digestHex": "761f84db"
+      },
+      {
+        "query": null,
+        "body": null,
+        "type": "json",
+        "expected": "99914b932bd37a50b983c5e7c90ae93b",
+        "digestHex": "02fbe7b9"
+      },
+      {
+        "query": {
+          "k": "a b/c"
+        },
+        "body": [
+          1,
+          null,
+          {
+            "x": false
+          }
+        ],
+        "type": "json",
+        "expected": "563d9c830cb4f816ee450fb126a75dd5",
+        "digestHex": "f484fef6"
+      },
+      {
+        "query": {
+          "b": "中",
+          "c": "",
+          "d": ""
+        },
+        "body": {
+          "api_ph": "ph"
+        },
+        "type": "json",
+        "expected": "16999aca36883c9a24c8a40684ab7332",
+        "digestHex": "a2bb4445"
+      }
+    ],
+    "sequential": {
+      "startupRandom": 1786175710,
+      "count": 116,
+      "calls": [
+        {
+          "query": {},
+          "body": {},
+          "type": "json",
+          "expectedMd5": "99914b932bd37a50b983c5e7c90ae93b",
+          "expected": "fbebac9c754adfc2d3a6a5a4a15946197e9a32debabab8b8b7b6b5af"
+        },
+        {
+          "query": {
+            "a": "1"
+          },
+          "body": {
+            "b": "中文"
+          },
+          "type": "json",
+          "expectedMd5": "175bea461fb0de0028026ccf52749089",
+          "expected": "9383c4f41d22b7aabacecdccc08e535316f25ab6d2d2d0d0dfdeddc7"
+        },
+        {
+          "query": {},
+          "body": {
+            "sid": "x",
+            "n": 2
+          },
+          "type": "form-data",
+          "expectedMd5": "deeb31211e8362e0f61d975d3adced97",
+          "expected": "8292d5e50c33a6bba8dfdcdd02fb751607e34ba7c3c3c1c1cecfccd6"
+        },
+        {
+          "query": {
+            "pcursor": "2.5"
+          },
+          "body": {
+            "ok": true,
+            "s": "a\"b"
+          },
+          "type": "json",
+          "expectedMd5": "6c70b0305c6fafe3ae90e71f2bb8be7a",
+          "expected": "d9c98ebe5768fde0f284878638dbe5c05cb810fc98989a9a9594978d"
+        }
+      ],
+      "expectedCount": 120
+    },
+    "parseQuery": [
+      {
+        "url": "/rest/cp/a",
+        "expected": {}
+      },
+      {
+        "url": "/rest/cp/a?b=1&c=",
+        "expected": {
+          "b": "1",
+          "c": ""
+        }
+      },
+      {
+        "url": "https://cp.kuaishou.com/rest/cp/a?q=%E4%B8%AD%E6%96%87&x=a%3Db&y",
+        "expected": {
+          "q": "中文",
+          "x": "a=b",
+          "y": ""
+        }
+      },
+      {
+        "url": "https://cp.kuaishou.com/rest/cp/a?b=1?c=2",
+        "expected": {
+          "c": "2"
+        }
+      },
+      {
+        "url": "?=1&k=v",
+        "expected": {
+          "k": "v"
+        }
+      },
+      {
+        "url": "",
+        "expected": {}
+      }
+    ]
+  },
+  "kww": {
+    "weapon": [
+      {
+        "plain": "",
+        "key": "webweaponconfigs",
+        "expected": "lVM43MhMO9sOU9Oi1j7CAQ=="
+      },
+      {
+        "plain": "hello",
+        "key": "K8wm5PvY9nX7qJc2",
+        "expected": "F4aHIBSR1TfwH0kCAITiQg=="
+      },
+      {
+        "plain": "中文😀|did|PCLive|1786809590431|goG2elf1",
+        "key": "H4tL6rNd3vB9xM5k",
+        "expected": "aYy2GTgktXJUbLyf9F7yLhDYaRYwI1C9TMHUJJW8XQm3lrpEwoc62biIn8R+0N8/"
+      },
+      {
+        "plain": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "key": "webweaponconfigs",
+        "expected": "y/V+3BM+qxlyokoAqPN3krAzOUw5Lp6/Wg6+oCYdbJ1UqSJsB1A7TGMPilZpfkM+"
+      }
+    ],
+    "kwfv1": [
+      {
+        "href": "https://www.kuaishou.com/new-reco",
+        "did": "web_abc",
+        "productName": "kuaishou-vision",
+        "nowMs": 1786809590431,
+        "nonce": "goG2elf1",
+        "expected": "K3W8mWh8a+DNMTEHp+RjWpseWErBZfrntMAZf5l0EzRyDJkl8EIIlZUWb3z6yXDBuE5ILk3TSSYvY70MetFb1T3d0w0LRohX2ZJaFb36chQHgrMitzOwW7Goi3pfCZjKFR4"
+      },
+      {
+        "href": "https://cp.kuaishou.com/article/publish/video?origin=www.kuaishou.com",
+        "did": "web_cp",
+        "productName": "onvideo-cp",
+        "nowMs": 1700000000000,
+        "nonce": "Ab12Cd34",
+        "expected": "KWCGFWTwNPdvjloHEGtEtn5SZD2AltnKoxBPlzE0+6U6pc6gTnX0d3q62zzLGjRPT+xnecQnvbGRsyEh9Ll1YXPTsjL35eBaN+i6NYOkRpjuZ2hY2GEXvJvgDz+8oFqpqb9OX8Zp8ZnJkKnSodG4VYTgF=="
+      },
+      {
+        "href": "https://live.kuaishou.com/",
+        "did": "",
+        "productName": "PCLive",
+        "nowMs": 1600000000000,
+        "nonce": "zzzzzzzz",
+        "expected": "K408WWQK1WMvAnj5ysWy4uSnYqGmU0+9NBS2a2ComQyBwR4dChDxW8p5F//jHgAZ/WJh/WqAb9+3J/lmF8p/3zdwF=="
+      }
+    ],
+    "kwscode": [
+      {
+        "href": "https://www.kuaishou.com/new-reco",
+        "secToken": "0123456789abcdefTOKEN",
+        "did": "web_abc",
+        "productName": "kuaishou-vision",
+        "nowMs": 1786809590431,
+        "expected": "KOjsMWLIm+kO/f7MlE6gmsc4e/9zZHjFABTH1lF31C4N7mDXeejOsLH4IFZZdFWSVVQVCKV6xMw6mWpAK2Qs/5evM57wHL/4N/T7lqztJ1IjxQTG/UamUwiEuVq/k1cXSuA"
+      },
+      {
+        "href": "https://live.kuaishou.com/",
+        "secToken": "short",
+        "did": "d",
+        "productName": "PCLive",
+        "nowMs": 123,
+        "expected": "KHAccWTQF6JWeymH6/OmD735GpXZEoiLYZYXYj84QhCtZ0+wIZxGVqGsWN4eChE9SZg"
+      }
+    ],
+    "looksLikeShell": [
+      {
+        "value": "",
+        "tag": "F",
+        "expected": false
+      },
+      {
+        "value": "abc",
+        "tag": "F",
+        "expected": false
+      },
+      {
+        "value": "K1234WxxxxxFyy",
+        "tag": "F",
+        "expected": true
+      },
+      {
+        "value": "K1234WxxxxxSyy",
+        "tag": "S",
+        "expected": true
+      },
+      {
+        "value": "K1234WxxxxxSyy",
+        "tag": "F",
+        "expected": false
+      },
+      {
+        "value": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "tag": "F",
+        "expected": false
+      },
+      {
+        "value": "K3W8mWh8a+DNMTEHp+RjWpseWErBZfrntMAZf5l0EzRyDJkl8EIIlZUWb3z6yXDBuE5ILk3TSSYvY70MetFb1T3d0w0LRohX2ZJaFb36chQHgrMitzOwW7Goi3pfCZjKFR4",
+        "tag": "F",
+        "expected": true
+      },
+      {
+        "value": "KWCGFWTwNPdvjloHEGtEtn5SZD2AltnKoxBPlzE0+6U6pc6gTnX0d3q62zzLGjRPT+xnecQnvbGRsyEh9Ll1YXPTsjL35eBaN+i6NYOkRpjuZ2hY2GEXvJvgDz+8oFqpqb9OX8Zp8ZnJkKnSodG4VYTgF==",
+        "tag": "F",
+        "expected": true
+      },
+      {
+        "value": "K408WWQK1WMvAnj5ysWy4uSnYqGmU0+9NBS2a2ComQyBwR4dChDxW8p5F//jHgAZ/WJh/WqAb9+3J/lmF8p/3zdwF==",
+        "tag": "F",
+        "expected": true
+      },
+      {
+        "value": "KOjsMWLIm+kO/f7MlE6gmsc4e/9zZHjFABTH1lF31C4N7mDXeejOsLH4IFZZdFWSVVQVCKV6xMw6mWpAK2Qs/5evM57wHL/4N/T7lqztJ1IjxQTG/UamUwiEuVq/k1cXSuA",
+        "tag": "S",
+        "expected": true
+      },
+      {
+        "value": "KHAccWTQF6JWeymH6/OmD735GpXZEoiLYZYXYj84QhCtZ0+wIZxGVqGsWN4eChE9SZg",
+        "tag": "S",
+        "expected": true
+      }
+    ]
+  },
+  "axios": {
+    "values": [
+      {
+        "value": "a b",
+        "expected": "a+b"
+      },
+      {
+        "value": "HUDR_xxx$HE_yyy",
+        "expected": "HUDR_xxx$HE_yyy"
+      },
+      {
+        "value": "中文",
+        "expected": "%E4%B8%AD%E6%96%87"
+      },
+      {
+        "value": ":$,[]",
+        "expected": ":$,[]"
+      },
+      {
+        "value": "a+b",
+        "expected": "a%2Bb"
+      },
+      {
+        "value": 1,
+        "expected": "1"
+      },
+      {
+        "value": 1.5,
+        "expected": "1.5"
+      },
+      {
+        "value": true,
+        "expected": "true"
+      },
+      {
+        "value": false,
+        "expected": "false"
+      },
+      {
+        "value": null,
+        "expected": "null"
+      },
+      {
+        "value": [
+          1,
+          null,
+          2
+        ],
+        "expected": "1,,2"
+      },
+      {
+        "value": {
+          "z": 1
+        },
+        "expected": "[object+Object]"
+      },
+      {
+        "value": "😀",
+        "expected": "%F0%9F%98%80"
+      },
+      {
+        "value": "",
+        "expected": ""
+      }
+    ],
+    "query": [
+      {
+        "pairs": [
+          {
+            "key": "a",
+            "value": "b c"
+          },
+          {
+            "key": "__NS_hxfalcon",
+            "value": "HUDR_x$HE_y"
+          },
+          {
+            "key": "n",
+            "value": 1
+          },
+          {
+            "key": "flag",
+            "value": true
+          },
+          {
+            "key": "q",
+            "value": null
+          },
+          {
+            "key": "arr",
+            "value": [
+              1,
+              null,
+              2
+            ]
+          },
+          {
+            "key": "obj",
+            "value": {
+              "z": 1
+            }
+          },
+          {
+            "key": "ch",
+            "value": "中文"
+          },
+          {
+            "key": "plus",
+            "value": "a+b"
+          },
+          {
+            "key": "sym",
+            "value": ":$,[]"
+          }
+        ],
+        "expected": "a=b+c&__NS_hxfalcon=HUDR_x$HE_y&n=1&flag=true&q=null&arr=1,,2&obj=[object+Object]&ch=%E4%B8%AD%E6%96%87&plus=a%2Bb&sym=:$,[]"
+      },
+      {
+        "pairs": [
+          {
+            "key": "kpn",
+            "value": "KUAISHOU_VISION"
+          },
+          {
+            "key": "caver",
+            "value": "2"
+          }
+        ],
+        "expected": "kpn=KUAISHOU_VISION&caver=2"
+      },
+      {
+        "pairs": [],
+        "expected": ""
+      }
+    ]
+  },
+  "flags": {
+    "needSign": [
+      {
+        "url": "/rest/v/profile/get",
+        "expected": true
+      },
+      {
+        "url": "/rest/v/profile/user/v2",
+        "expected": true
+      },
+      {
+        "url": "/rest/v/search/user",
+        "expected": true
+      },
+      {
+        "url": "/rest/v/search/feed",
+        "expected": true
+      },
+      {
+        "url": "/rest/v/profile/feed",
+        "expected": true
+      },
+      {
+        "url": "/rest/v/feed/hot",
+        "expected": true
+      },
+      {
+        "url": "/rest/v/feed/liked",
+        "expected": true
+      },
+      {
+        "url": "/rest/v/collect/list",
+        "expected": true
+      },
+      {
+        "url": "/rest/v/profile/private/list",
+        "expected": true
+      },
+      {
+        "url": "/rest/v/profile/get/extra",
+        "expected": false
+      },
+      {
+        "url": "/live_api/comment/list",
+        "expected": false
+      },
+      {
+        "url": "",
+        "expected": false
+      }
+    ],
+    "liveNeedSign": [
+      {
+        "url": "/live_api/baseuser/userinfo/sensitive",
+        "expected": true
+      },
+      {
+        "url": "/live_api/search/author",
+        "expected": true
+      },
+      {
+        "url": "/live_api/comment/list",
+        "expected": true
+      },
+      {
+        "url": "/live_api/search/overview",
+        "expected": true
+      },
+      {
+        "url": "/live_api/search/category",
+        "expected": true
+      },
+      {
+        "url": "/live_api/search/liveStream",
+        "expected": true
+      },
+      {
+        "url": "/live_api/profile/public",
+        "expected": true
+      },
+      {
+        "url": "/live_api/profile/private",
+        "expected": true
+      },
+      {
+        "url": "/live_api/profile/liked",
+        "expected": true
+      },
+      {
+        "url": "/live_api/web/header/searchHotUserListQuery",
+        "expected": true
+      },
+      {
+        "url": "/live_api/web/header/searchSuggestQuery",
+        "expected": true
+      },
+      {
+        "url": "/live_api/liveroom/websocketinfo",
+        "expected": true
+      },
+      {
+        "url": "/live_api/profileInterestMask/list",
+        "expected": true
+      },
+      {
+        "url": "/live_api/profile/feedbyid",
+        "expected": true
+      },
+      {
+        "url": "/live_api/profile/likestatus",
+        "expected": true
+      },
+      {
+        "url": "/live_api/playback/list",
+        "expected": true
+      },
+      {
+        "url": "/live_api/baseuser/author/checkfollow",
+        "expected": true
+      },
+      {
+        "url": "/live_api/baseuser/userinfo/byid",
+        "expected": true
+      },
+      {
+        "url": "/live_api/baseuser/userLogin",
+        "expected": true
+      },
+      {
+        "url": "/live_api/follow/all",
+        "expected": true
+      },
+      {
+        "url": "/live_api/gameboard/list",
+        "expected": true
+      },
+      {
+        "url": "/live_api/home/more",
+        "expected": true
+      },
+      {
+        "url": "/live_api/playback/detail",
+        "expected": true
+      },
+      {
+        "url": "/live_api/liveroom/like",
+        "expected": true
+      },
+      {
+        "url": "/live_api/liveroom/status",
+        "expected": true
+      },
+      {
+        "url": "/live_api/non-gameboard/list",
+        "expected": true
+      },
+      {
+        "url": "/live_api/playback/download",
+        "expected": true
+      },
+      {
+        "url": "/live_api/profile/interestlist",
+        "expected": true
+      },
+      {
+        "url": "/live_api/comment/list?x=1",
+        "expected": true
+      },
+      {
+        "url": "/live_api/nope",
+        "expected": false
+      },
+      {
+        "url": "",
+        "expected": false
+      }
+    ],
+    "liveSignUrl": [
+      {
+        "url": "/live_api/baseuser/userinfo/sensitive",
+        "expected": "/rest/k/user/info/sensitive"
+      },
+      {
+        "url": "/live_api/search/author",
+        "expected": "/rest/k/live/search/user"
+      },
+      {
+        "url": "/live_api/comment/list",
+        "expected": "/rest/k/photo/comment/list"
+      },
+      {
+        "url": "/live_api/search/overview",
+        "expected": "/rest/k/live/search"
+      },
+      {
+        "url": "/live_api/search/category",
+        "expected": "/rest/k/live/game/search/category"
+      },
+      {
+        "url": "/live_api/search/liveStream",
+        "expected": "/rest/k/live/game/search/liveStream"
+      },
+      {
+        "url": "/live_api/profile/public",
+        "expected": "/rest/k/feed/profile"
+      },
+      {
+        "url": "/live_api/profile/private",
+        "expected": "/rest/k/feed/profile"
+      },
+      {
+        "url": "/live_api/profile/liked",
+        "expected": "/rest/k/feed/liked"
+      },
+      {
+        "url": "/live_api/web/header/searchHotUserListQuery",
+        "expected": "/rest/k/live/search/hot"
+      },
+      {
+        "url": "/live_api/web/header/searchSuggestQuery",
+        "expected": "/rest/k/live/search/suggest"
+      },
+      {
+        "url": "/live_api/liveroom/websocketinfo",
+        "expected": "/rest/k/live/websocket/info"
+      },
+      {
+        "url": "/live_api/profileInterestMask/list",
+        "expected": "/rest/k/pc-live/author/category"
+      },
+      {
+        "url": "/live_api/profile/feedbyid",
+        "expected": "/rest/k/photo"
+      },
+      {
+        "url": "/live_api/profile/likestatus",
+        "expected": "/rest/k/photo"
+      },
+      {
+        "url": "/live_api/playback/list",
+        "expected": "/rest/k/playback/product/list"
+      },
+      {
+        "url": "/live_api/baseuser/author/checkfollow",
+        "expected": "/rest/k/user/info"
+      },
+      {
+        "url": "/live_api/baseuser/userinfo/byid",
+        "expected": "/rest/k/user/info"
+      },
+      {
+        "url": "/live_api/baseuser/userLogin",
+        "expected": "/rest/k/user/info"
+      },
+      {
+        "url": "/live_api/follow/all",
+        "expected": "/rest/k/live/relation/follower"
+      },
+      {
+        "url": "/live_api/gameboard/list",
+        "expected": "/rest/k/pc-live/live/getByGame"
+      },
+      {
+        "url": "/live_api/home/more",
+        "expected": "/rest/k/pc-live/labels/switch"
+      },
+      {
+        "url": "/live_api/playback/detail",
+        "expected": "/rest/k/playback/product/play"
+      },
+      {
+        "url": "/live_api/liveroom/like",
+        "expected": "/rest/k/live/like"
+      },
+      {
+        "url": "/live_api/liveroom/status",
+        "expected": "/rest/wd/live/liveStream/status"
+      },
+      {
+        "url": "/live_api/non-gameboard/list",
+        "expected": "/rest/k/pc-live/live/synthesize"
+      },
+      {
+        "url": "/live_api/playback/download",
+        "expected": "/rest/k/material/download"
+      },
+      {
+        "url": "/live_api/profile/interestlist",
+        "expected": "/rest/k/pc-live/author/profile/reco"
+      },
+      {
+        "url": "/live_api/comment/list?x=1",
+        "expected": "/rest/k/photo/comment/list"
+      },
+      {
+        "url": "/live_api/nope",
+        "expected": "/live_api/nope"
+      },
+      {
+        "url": "",
+        "expected": ""
+      }
+    ],
+    "loginNeedSign": [
+      {
+        "url": "/rest/c/infra/ks/qr/start",
+        "expected": true
+      },
+      {
+        "url": "/rest/c/infra/ks/new/qr/start",
+        "expected": true
+      },
+      {
+        "url": "/rest/c/infra/ks/qr/scanResult",
+        "expected": true
+      },
+      {
+        "url": "/rest/c/infra/ks/new/qr/scanResult",
+        "expected": true
+      },
+      {
+        "url": "/rest/c/infra/ks/qr/acceptResult",
+        "expected": true
+      },
+      {
+        "url": "/rest/c/infra/ks/new/qr/acceptResult",
+        "expected": true
+      },
+      {
+        "url": "/pass/bid/web/sns/login/code",
+        "expected": true
+      },
+      {
+        "url": "/pass/bid/web/sns/quickLoginByKsAuth",
+        "expected": true
+      },
+      {
+        "url": "/pass/kuaishou/sms/requestMobileCode",
+        "expected": true
+      },
+      {
+        "url": "/pass/kuaishou/login/mobileCode",
+        "expected": true
+      },
+      {
+        "url": "/pass/kuaishou/login/qr/callback",
+        "expected": true
+      },
+      {
+        "url": "/rest/c/infra/ks/qr/start?x=1",
+        "expected": true
+      },
+      {
+        "url": "/pass/kuaishou/pc/pageInfo",
+        "expected": false
+      },
+      {
+        "url": "",
+        "expected": false
+      }
+    ],
+    "cpNeedSign": [
+      {
+        "url": "/rest/cp/works/v2/video/pc/submit",
+        "expected": true
+      },
+      {
+        "url": "https://cp.kuaishou.com/rest/cp/works/v2/common/pc/nearby?x=1",
+        "expected": true
+      },
+      {
+        "url": "/rest/cp/works/v2/video/pc/edit/info",
+        "expected": true
+      },
+      {
+        "url": "/rest/zt/location/wi/poi/search",
+        "expected": true
+      },
+      {
+        "url": "/foo/rest/cp/works/v2/common/pc/ip2poi",
+        "expected": true
+      },
+      {
+        "url": "/rest/cp/works/v2/common/pc/current/user",
+        "expected": false
+      },
+      {
+        "url": "/rest/v2/creator/foo",
+        "expected": false
+      },
+      {
+        "url": "",
+        "expected": false
+      }
+    ],
+    "needSig3": [
+      {
+        "url": "/rest/cp/works/v2/video/pc/submit",
+        "expected": false
+      },
+      {
+        "url": "https://cp.kuaishou.com/rest/cp/works/v2/common/pc/nearby?x=1",
+        "expected": false
+      },
+      {
+        "url": "/rest/cp/works/v2/video/pc/edit/info",
+        "expected": false
+      },
+      {
+        "url": "/rest/zt/location/wi/poi/search",
+        "expected": false
+      },
+      {
+        "url": "/foo/rest/cp/works/v2/common/pc/ip2poi",
+        "expected": false
+      },
+      {
+        "url": "/rest/cp/works/v2/common/pc/current/user",
+        "expected": true
+      },
+      {
+        "url": "/rest/v2/creator/foo",
+        "expected": true
+      },
+      {
+        "url": "",
+        "expected": false
+      },
+      {
+        "url": "/rest/kd/a",
+        "expected": true
+      },
+      {
+        "url": "rest/v2/creator/x",
+        "expected": true
+      },
+      {
+        "url": "/rest/cp/works/v2/video/pc/submit",
+        "expected": false
+      }
+    ],
+    "whitelist": {
+      "sig4": [
+        "/rest/v/profile/get",
+        "/rest/v/profile/user/v2",
+        "/rest/v/search/user",
+        "/rest/v/search/feed",
+        "/rest/v/profile/feed",
+        "/rest/v/feed/hot",
+        "/rest/v/feed/liked",
+        "/rest/v/collect/list",
+        "/rest/v/profile/private/list"
+      ],
+      "login": [
+        "/rest/c/infra/ks/qr/start",
+        "/rest/c/infra/ks/new/qr/start",
+        "/rest/c/infra/ks/qr/scanResult",
+        "/rest/c/infra/ks/new/qr/scanResult",
+        "/rest/c/infra/ks/qr/acceptResult",
+        "/rest/c/infra/ks/new/qr/acceptResult",
+        "/pass/bid/web/sns/login/code",
+        "/pass/bid/web/sns/quickLoginByKsAuth",
+        "/pass/kuaishou/sms/requestMobileCode",
+        "/pass/kuaishou/login/mobileCode",
+        "/pass/kuaishou/login/qr/callback"
+      ],
+      "cp": [
+        "rest/cp/works/v2/common/pc/nearby",
+        "rest/cp/works/v2/video/pc/edit/info",
+        "rest/cp/works/v2/common/pc/ip2poi",
+        "/rest/zt/location/wi/poi/search",
+        "/rest/cp/works/v2/video/pc/submit"
+      ],
+      "live": {
+        "/live_api/baseuser/userinfo/sensitive": "/rest/k/user/info/sensitive",
+        "/live_api/search/author": "/rest/k/live/search/user",
+        "/live_api/comment/list": "/rest/k/photo/comment/list",
+        "/live_api/search/overview": "/rest/k/live/search",
+        "/live_api/search/category": "/rest/k/live/game/search/category",
+        "/live_api/search/liveStream": "/rest/k/live/game/search/liveStream",
+        "/live_api/profile/public": "/rest/k/feed/profile",
+        "/live_api/profile/private": "/rest/k/feed/profile",
+        "/live_api/profile/liked": "/rest/k/feed/liked",
+        "/live_api/web/header/searchHotUserListQuery": "/rest/k/live/search/hot",
+        "/live_api/web/header/searchSuggestQuery": "/rest/k/live/search/suggest",
+        "/live_api/liveroom/websocketinfo": "/rest/k/live/websocket/info",
+        "/live_api/profileInterestMask/list": "/rest/k/pc-live/author/category",
+        "/live_api/profile/feedbyid": "/rest/k/photo",
+        "/live_api/profile/likestatus": "/rest/k/photo",
+        "/live_api/playback/list": "/rest/k/playback/product/list",
+        "/live_api/baseuser/author/checkfollow": "/rest/k/user/info",
+        "/live_api/baseuser/userinfo/byid": "/rest/k/user/info",
+        "/live_api/baseuser/userLogin": "/rest/k/user/info",
+        "/live_api/follow/all": "/rest/k/live/relation/follower",
+        "/live_api/gameboard/list": "/rest/k/pc-live/live/getByGame",
+        "/live_api/home/more": "/rest/k/pc-live/labels/switch",
+        "/live_api/playback/detail": "/rest/k/playback/product/play",
+        "/live_api/liveroom/like": "/rest/k/live/like",
+        "/live_api/liveroom/status": "/rest/wd/live/liveStream/status",
+        "/live_api/non-gameboard/list": "/rest/k/pc-live/live/synthesize",
+        "/live_api/playback/download": "/rest/k/material/download",
+        "/live_api/profile/interestlist": "/rest/k/pc-live/author/profile/reco"
+      }
+    }
+  },
+  "meta": {
+    "hxfalconCases": 47,
+    "sig3Calls": 4
+  }
+}

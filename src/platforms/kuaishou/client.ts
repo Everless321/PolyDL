@@ -1,6 +1,7 @@
 /**
  * 快手 GraphQL 客户端 —— 无签名，仅需 Cookie
  */
+import { throwIfKuaishouStatus } from './errors.js'
 import type { KuaishouConfig, GraphqlResponse } from './types.js'
 
 const GRAPHQL_ENDPOINT = 'https://www.kuaishou.com/graphql'
@@ -48,6 +49,7 @@ export class KuaishouClient {
     }
 
     const json = (await response.json()) as GraphqlResponse<T>
+    throwIfKuaishouStatus(json)
 
     if (json.errors?.length) {
       throw new Error(`快手 GraphQL 错误: ${json.errors.map(e => e.message).join('; ')}`)
