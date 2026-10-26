@@ -31,7 +31,7 @@ async function main() {
   // 2) 主页作品分页（AsyncGenerator，每次 yield 一页归一化作品）
   const collected: KuaishouWork[] = []
   let n = 0
-  for await (const page of handler.fetchUserWorks(url, { maxCounts: 20 })) {
+  for await (const page of handler.fetchUserPostVideos(url, { maxCounts: 20 })) {
     for (const work of page) {
       collected.push(work)
       console.log(

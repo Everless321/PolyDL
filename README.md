@@ -178,7 +178,7 @@ import {
 const cookie = process.env.KS_COOKIES || ''
 const handler = new KuaishouHandler({ cookie })
 
-const work = await handler.fetchWork('https://www.kuaishou.com/short-video/<photoId>')
+const work = await handler.fetchOneVideo('https://www.kuaishou.com/short-video/<photoId>')
 const downloader = new KuaishouDownloader({
   cookie,
   downloadPath: './downloads',
@@ -189,7 +189,7 @@ const downloader = new KuaishouDownloader({
 await downloader.downloadWork(work)
 
 const works = []
-for await (const page of handler.fetchUserWorks('https://www.kuaishou.com/profile/<eid>', {
+for await (const page of handler.fetchUserPostVideos('https://www.kuaishou.com/profile/<eid>', {
   maxCounts: 20,
 })) {
   works.push(...page)
@@ -206,7 +206,7 @@ for await (const page of handler.searchWorks('美食', { maxCounts: 20 })) {
 for await (const page of handler.fetchFeedHot({ maxCounts: 10 })) {
   console.log(page.length)
 }
-for await (const page of handler.fetchComments('<photoId>', { maxCounts: 50 })) {
+for await (const page of handler.fetchPostComment('<photoId>', { maxCounts: 50 })) {
   console.log(page)
 }
 ```
@@ -372,6 +372,28 @@ new DouyinDownloader({ cookie: cookieA, device: deviceA })
 | `fetchSuggestWords(query, count)` | 搜索建议词 |
 | `fetchQueryUser(secUserIds)` | 查询用户 |
 | `fetchPostStats(itemId, awemeType, playDelta)` | 获取作品统计 |
+
+### KuaishouHandler
+
+方法名与 `DouyinHandler` 对齐。作品统一成 `KuaishouWork`，评论和用户是接口原始对象。完整对照见 [快手模块文档](src/platforms/kuaishou/README.md#与抖音对应的方法)。
+
+| 方法 | 说明 |
+|------|------|
+| `fetchUserProfile(eidOrUrl)` | 获取用户资料 |
+| `fetchOneVideo(urlOrPhotoId)` | 获取单个作品详情 (支持链接、短链或ID) |
+| `fetchUserPostVideos(eidOrUrl, options)` | 获取用户作品列表 (生成器) |
+| `fetchUserLikeVideos(options)` | 获取当前登录账号的喜欢列表 (生成器) |
+| `fetchUserCollectionVideos({ userId?, ...options })` | 获取收藏，不传 userId 为当前登录账号 (生成器) |
+| `fetchRelatedVideos(photoIdOrUrl, options)` | 获取相关推荐作品，只有一页 (生成器) |
+| `fetchPostComment(photoIdOrUrl, options)` | 获取作品评论 (生成器) |
+| `fetchPostCommentReply(photoIdOrUrl, rootCommentId, options)` | 获取评论回复 (生成器) |
+| `fetchUserFollowing(options)` | 获取当前登录账号的关注列表 (生成器) |
+| `fetchUserFollower(options)` | 获取当前登录账号的粉丝列表 (生成器) |
+| `searchWorks(keyword, options)` | 搜索作品，快手独有 (生成器) |
+| `fetchFeedHot(options)` | 推荐流，快手独有 (生成器) |
+| `fetchSearchUser(keyword, options)` | 搜索用户，快手独有 (生成器) |
+| `fetchUserPrivateVideos(options)` | 当前登录账号的私密作品，快手独有 (生成器) |
+| `fetchUserLiveReplays(eidOrUrl, options)` | 直播回放，快手独有 (生成器) |
 
 ### DouyinDownloader
 

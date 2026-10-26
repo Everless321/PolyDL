@@ -27,7 +27,7 @@ PolyDL 多平台架构下，快手是继抖音之后的第二个平台。抖音�
 - 关系、喜欢、收藏、私密：`getRelation`、`getLikedList`、`getCollectList`、`getPrivateList`
 - 直播回放：`getPlaybackList`（不签名）
 
-`KuaishouHandler` 在这些接口之上返回 `normalizeWork` 之后的 `KuaishouWork`：`fetchWork`、`fetchUserWorks`、`searchWorks`、`fetchFeedHot`、`fetchComments`、`fetchUserProfile`。
+`KuaishouHandler` 在这些接口之上包了一层，方法名与 `DouyinHandler` 对齐：`fetchOneVideo`、`fetchUserPostVideos`、`fetchUserLikeVideos`、`fetchUserCollectionVideos`、`fetchPostComment` 等，作品输出 `normalizeWork` 之后的 `KuaishouWork`。完整对照见 [快手模块文档](../src/platforms/kuaishou/README.md#与抖音对应的方法)。
 
 作品总数仍取 `visionProfile.userProfile.ownerCount.photo_public`（`photo` 字段经常是 null）。
 
@@ -84,7 +84,7 @@ const handler = new KuaishouHandler({ cookie })
 const api = new KuaishouWebApi({ cookie })
 
 const detail = await api.getVideoDetail('<photoId 或作品链接>')
-for await (const page of handler.fetchUserWorks('<eid 或主页链接>', { maxCounts: 20 })) {
+for await (const page of handler.fetchUserPostVideos('<eid 或主页链接>', { maxCounts: 20 })) {
   await new KuaishouDownloader({ cookie, mediaType: 'video', cover: true }).downloadWorks(page)
 }
 ```

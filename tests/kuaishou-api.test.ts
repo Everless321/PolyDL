@@ -468,7 +468,7 @@ describe('KuaishouHandler', () => {
     expect(pages[0][0].videoUrl).toBe('https://v/a.mp4')
   })
 
-  it('fetchUserPostVideos 仍可用，REST 失败时退回 GraphQL', async () => {
+  it('fetchUserPostVideos REST 失败时退回 GraphQL，仍输出 KuaishouWork', async () => {
     let n = 0
     vi.stubGlobal(
       'fetch',
@@ -498,8 +498,93 @@ describe('KuaishouHandler', () => {
     const handler = new KuaishouHandler({ cookie: 'a=b', signer: fakeSigner })
     const pages = []
     for await (const page of handler.fetchUserPostVideos('u1')) pages.push(page)
-    expect(pages[0].feeds[0].photo.id).toBe('p')
+    expect(pages[0][0].workId).toBe('p')
+    expect(pages[0][0].author.nickname).toBe('n')
     expect(n).toBe(2)
+  })
+
+  it('抖音同名方法：喜欢 / 收藏 / 私密 / 相关推荐输出 KuaishouWork', async () => {
+    const feed = (id: string) =>
+      ok({
+        result: 1,
+        pcursor: 'no_more',
+        feeds: [{ author: { id: 'u', name: 'n' }, photo: { id, caption: id } }],
+      })
+    const calls = install([
+      feed('liked1'),
+      ok({ result: 1, eid: 'me' }),
+      feed('col1'),
+      feed('col2'),
+      feed('pri1'),
+      ok({
+        data: {
+          visionShortVideoReco: {
+            feeds: [
+              { author: { id: 'u', name: 'n' }, photo: { id: 'r1' } },
+              { author: { id: 'u', name: 'n' }, photo: { id: 'r2' } },
+            ],
+          },
+        },
+      }),
+    ])
+    const handler = new KuaishouHandler({ cookie: COOKIE, signer: fakeSigner })
+    const ids = async (iter: AsyncIterable<{ workId: string }[]>) => {
+      const out: string[] = []
+      for await (const page of iter) out.push(...page.map(w => w.workId))
+      return out
+    }
+    expect(await ids(handler.fetchUserLikeVideos())).toEqual(['liked1'])
+    expect(await ids(handler.fetchUserCollectionVideos())).toEqual(['col1'])
+    expect(
+      await ids(
+        handler.fetchUserCollectionVideos({ userId: 'https://www.kuaishou.com/profile/3xo' })
+      )
+    ).toEqual(['col2'])
+    expect(await ids(handler.fetchUserPrivateVideos())).toEqual(['pri1'])
+    expect(await ids(handler.fetchRelatedVideos('ph1', { maxCounts: 1 }))).toEqual(['r1'])
+
+    expect(calls[0].url).toContain('/rest/v/feed/liked')
+    expect(calls[1].url).toContain('/rest/v/profile/get')
+    expect(JSON.parse(calls[2].init.body ?? '').userId).toBe('me')
+    expect(JSON.parse(calls[3].init.body ?? '').userId).toBe('3xo')
+    expect(calls[4].url).toContain('/rest/v/profile/private/list')
+    expect(JSON.parse(calls[5].init.body ?? '').operationName).toBe('visionShortVideoReco')
+  })
+
+  it('抖音同名方法：楼中楼 / 关注 / 粉丝 / 搜索用户 / 回放输出原始对象', async () => {
+    const calls = install([
+      ok({
+        data: {
+          visionSubCommentList: { pcursorV2: 'no_more', subCommentsV2: [{ commentId: 's1' }] },
+        },
+      }),
+      ok({ result: 1, eid: 'me' }),
+      ok({ result: 1, pcursor: 'no_more', fols: [{ user_id: 'f1' }] }),
+      ok({ result: 1, pcursor: 'no_more', fols: [{ user_id: 'fan1' }] }),
+      ok({ result: 1, pcursor: '1', searchSessionId: 'sess', users: [{ user_id: 'su1' }] }),
+      ok({ result: 1, pcursor: 'no_more', searchSessionId: 'sess', users: [{ user_id: 'su2' }] }),
+      ok({ result: 1, pcursor: 'no_more', livePlayBackList: [{ id: 'pb1' }] }),
+    ])
+    const handler = new KuaishouHandler({ cookie: COOKIE, signer: fakeSigner })
+    const all = async (iter: AsyncIterable<unknown[]>) => {
+      const out: unknown[] = []
+      for await (const page of iter) out.push(...page)
+      return out
+    }
+    expect(await all(handler.fetchPostCommentReply('ph1', 'root1'))).toEqual([{ commentId: 's1' }])
+    expect(await all(handler.fetchUserFollowing())).toEqual([{ user_id: 'f1' }])
+    expect(await all(handler.fetchUserFollower())).toEqual([{ user_id: 'fan1' }])
+    expect(await all(handler.fetchSearchUser('跑步'))).toEqual([
+      { user_id: 'su1' },
+      { user_id: 'su2' },
+    ])
+    expect(await all(handler.fetchUserLiveReplays('3xo'))).toEqual([{ id: 'pb1' }])
+
+    expect(JSON.parse(calls[0].init.body ?? '').variables.rootCommentId).toBe('root1')
+    expect(JSON.parse(calls[2].init.body ?? '').ftype).toBe(1)
+    expect(JSON.parse(calls[3].init.body ?? '').ftype).toBe(2)
+    expect(JSON.parse(calls[5].init.body ?? '').searchSessionId).toBe('sess')
+    expect(JSON.parse(calls[6].init.body ?? '').userId).toBe('3xo')
   })
 
   it('fetchWork / searchWorks / fetchFeedHot / fetchComments 返回归一化或评论页', async () => {

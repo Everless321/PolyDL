@@ -95,6 +95,12 @@ function commentBatch(page: KuaishouJson): unknown[] {
   return asArray(page.rootComments)
 }
 
+function subCommentBatch(page: KuaishouJson): unknown[] {
+  const v2 = asArray(page.subCommentsV2)
+  if (v2.length > 0) return v2
+  return asArray(page.subComments)
+}
+
 function relationBatch(page: KuaishouJson): unknown[] {
   const authors = asArray(page.authors)
   if (authors.length > 0) return authors
@@ -377,6 +383,21 @@ export class KuaishouWebApi {
     return this.node(payload, 'visionSubCommentList')
   }
 
+  async *iterSubComments(
+    photoId: string,
+    rootCommentId: string,
+    options: KuaishouIterOptions = {}
+  ): AsyncGenerator<unknown[]> {
+    yield* this.iterate(
+      cursor =>
+        this.getSubCommentList(photoId, rootCommentId, cursor).then(page => ({
+          items: subCommentBatch(page),
+          cursor: commentCursor(page),
+        })),
+      options.maxCounts
+    )
+  }
+
   /** GET 当前登录用户资料。命中签名白名单。成功时缓存 eid。 */
   async getProfile(options: { referer?: string; profileId?: string } = {}): Promise<KuaishouJson> {
     let referer = options.referer
@@ -505,6 +526,22 @@ export class KuaishouWebApi {
     )
   }
 
+  /** 翻页时回传上一页的 searchSessionId。 */
+  async *iterSearchUser(
+    keyword: string,
+    options: KuaishouIterOptions = {}
+  ): AsyncGenerator<unknown[]> {
+    let sessionId = ''
+    yield* this.iterate(
+      cursor =>
+        this.searchUser(keyword, cursor, sessionId).then(page => {
+          sessionId = String(page.searchSessionId ?? sessionId)
+          return { items: asArray(page.users), cursor: feedCursor(page) }
+        }),
+      options.maxCounts
+    )
+  }
+
   /**
    * 关注 ftype=1 / 粉丝 ftype=2。body 键序 pcursor、ftype。
    * 不在签名白名单。Referer 用 profile/get 缓存的本人 eid。
@@ -550,6 +587,17 @@ export class KuaishouWebApi {
     )
   }
 
+  async *iterLikedList(options: KuaishouIterOptions = {}): AsyncGenerator<unknown[]> {
+    yield* this.iterate(
+      cursor =>
+        this.getLikedList(cursor).then(page => ({
+          items: asArray(page.feeds),
+          cursor: feedCursor(page),
+        })),
+      options.maxCounts
+    )
+  }
+
   /** 收藏。键名是 userId（驼峰），page=collect。不传 userId 时用本人 eid。 */
   async getCollectList(userId = '', pcursor = ''): Promise<KuaishouJson> {
     const uid = String(userId || (await this.ensureSelfEid()) || '')
@@ -558,6 +606,20 @@ export class KuaishouWebApi {
       '/rest/v/collect/list',
       { userId: uid, pcursor: String(pcursor ?? ''), page: 'collect' },
       { referer: uid ? `${KUAISHOU_HOST}/profile/${uid}` : undefined }
+    )
+  }
+
+  async *iterCollectList(
+    userId = '',
+    options: KuaishouIterOptions = {}
+  ): AsyncGenerator<unknown[]> {
+    yield* this.iterate(
+      cursor =>
+        this.getCollectList(userId, cursor).then(page => ({
+          items: asArray(page.feeds),
+          cursor: feedCursor(page),
+        })),
+      options.maxCounts
     )
   }
 
@@ -576,6 +638,17 @@ export class KuaishouWebApi {
     )
   }
 
+  async *iterPrivateList(options: KuaishouIterOptions = {}): AsyncGenerator<unknown[]> {
+    yield* this.iterate(
+      cursor =>
+        this.getPrivateList(cursor).then(page => ({
+          items: asArray(page.feeds),
+          cursor: feedCursor(page),
+        })),
+      options.maxCounts
+    )
+  }
+
   /** 端点已 404，Python 禁止发包。 */
   getHistoryList(_pcursor = ''): Promise<never> {
     return Promise.reject(new Error(OFFLINE_HISTORY))
@@ -588,6 +661,20 @@ export class KuaishouWebApi {
       '/rest/v/live/playBack/list',
       { userId: String(userId), pcursor: String(pcursor ?? '') },
       { referer: `${KUAISHOU_HOST}/profile/${userId}` }
+    )
+  }
+
+  async *iterPlaybackList(
+    userId: string,
+    options: KuaishouIterOptions = {}
+  ): AsyncGenerator<unknown[]> {
+    yield* this.iterate(
+      cursor =>
+        this.getPlaybackList(userId, cursor).then(page => ({
+          items: asArray(page.livePlayBackList),
+          cursor: feedCursor(page),
+        })),
+      options.maxCounts
     )
   }
 
